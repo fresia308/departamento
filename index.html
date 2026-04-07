@@ -13,31 +13,97 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--crema); color: var(--text); font-size: 15px; line-height: 1.6; }
-
+ 
   /* ── LANGUAGE SCREEN ── */
   #lang-screen {
     position: fixed; inset: 0; z-index: 9999;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     background: var(--verde); padding: 32px 24px;
+    transition: opacity .3s ease;
   }
   #lang-screen.gone { display: none; }
-  .lang-volcano { font-size: 52px; margin-bottom: 12px; }
-  .lang-title { color: #fff; font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 4px; }
-  .lang-sub { color: #A8D5B5; font-size: 13px; text-align: center; margin-bottom: 32px; }
-  .lang-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; max-width: 320px; }
+ 
+  /* decorative circles */
+  #lang-screen::before {
+    content: ''; position: absolute; top: -80px; right: -80px;
+    width: 260px; height: 260px; border-radius: 50%;
+    background: rgba(82,183,136,0.1); pointer-events: none;
+  }
+  #lang-screen::after {
+    content: ''; position: absolute; bottom: -60px; left: -60px;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: rgba(82,183,136,0.07); pointer-events: none;
+  }
+ 
+  .lang-volcano { font-size: 52px; margin-bottom: 10px; }
+  .lang-title { color: #fff; font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 4px; letter-spacing: -.01em; }
+  .lang-hook { color: #9FE1CB; font-size: 14px; text-align: center; margin-bottom: 6px; font-style: italic; }
+  .lang-divider { width: 40px; height: 1px; background: rgba(255,255,255,0.2); margin: 10px auto 20px; }
+  .lang-prompt { color: rgba(255,255,255,0.7); font-size: 13px; text-align: center; margin-bottom: 20px; }
+ 
+  /* auto-detect banner */
+  #lang-detect-banner {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 999px;
+    padding: 10px 18px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    max-width: 320px;
+    width: 100%;
+  }
+  #lang-detect-banner.visible { display: flex; }
+  .detect-text { color: #fff; font-size: 13px; font-weight: 500; flex: 1; }
+  .detect-yes {
+    background: #fff; color: var(--verde);
+    border: none; border-radius: 999px;
+    padding: 5px 14px; font-size: 12px; font-weight: 700;
+    cursor: pointer; flex-shrink: 0;
+    transition: opacity .15s;
+  }
+  .detect-yes:active { opacity: .8; }
+ 
+  .lang-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 320px; }
+ 
+  /* Español destacado — ocupa toda la fila */
+  .lang-btn-primary {
+    grid-column: 1 / -1;
+    background: rgba(255,255,255,0.18);
+    border: 2px solid rgba(255,255,255,0.5);
+    border-radius: var(--radius); padding: 16px 20px;
+    display: flex; align-items: center; gap: 14px;
+    cursor: pointer; transition: all .2s; width: 100%;
+  }
+  .lang-btn-primary:hover { background: rgba(255,255,255,0.26); border-color: rgba(255,255,255,0.8); }
+  .lang-btn-primary:active { transform: scale(0.98); }
+  .lang-btn-primary .lang-flag { font-size: 30px; line-height: 1; }
+  .lang-btn-primary .lang-info { text-align: left; }
+  .lang-btn-primary .lang-name { color: #fff; font-size: 16px; font-weight: 700; display: block; }
+  .lang-btn-primary .lang-native { color: #9FE1CB; font-size: 12px; display: block; margin-top: 1px; }
+  .lang-badge-rec {
+    margin-left: auto;
+    background: #52B788; color: #fff;
+    font-size: 10px; font-weight: 700;
+    padding: 3px 9px; border-radius: 999px;
+    letter-spacing: .04em; text-transform: uppercase;
+    flex-shrink: 0;
+  }
+ 
   .lang-btn {
-    background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.2);
-    border-radius: var(--radius); padding: 20px 14px;
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: var(--radius); padding: 16px 10px;
+    display: flex; flex-direction: column; align-items: center; gap: 7px;
     cursor: pointer; transition: all .2s;
   }
-  .lang-btn:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.5); }
-  .lang-btn:active { transform: scale(0.97); }
-  .lang-flag { font-size: 34px; line-height: 1; }
-  .lang-name { color: #fff; font-size: 15px; font-weight: 600; }
-  .lang-native { color: #9FE1CB; font-size: 12px; }
-
+  .lang-btn:hover { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.45); transform: translateY(-1px); }
+  .lang-btn:active { transform: scale(0.96) translateY(0); }
+  .lang-flag { font-size: 30px; line-height: 1; }
+  .lang-name { color: #fff; font-size: 13px; font-weight: 600; }
+  .lang-native { color: #9FE1CB; font-size: 11px; }
+ 
   /* ── LANG SWITCHER FLOTANTE ── */
   #lang-fab {
     position: fixed; bottom: 22px; right: 16px; z-index: 500;
@@ -47,7 +113,7 @@
     cursor: pointer; display: none;
     box-shadow: 0 2px 12px rgba(0,0,0,0.25);
   }
-
+ 
   /* ── HERO ── */
   .hero { position: relative; height: 320px; overflow: hidden; display: flex; align-items: flex-end; }
   .hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 60%; }
@@ -57,7 +123,7 @@
   .hero h1 { color: #fff; font-size: 26px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; text-shadow: 0 1px 4px rgba(0,0,0,0.4); }
   .hero-meta { display: flex; gap: 14px; flex-wrap: wrap; }
   .hero-meta span { color: rgba(255,255,255,0.85); font-size: 12px; display: flex; align-items: center; gap: 4px; }
-
+ 
   /* ── NAV ── */
   .nav-wrap { background: var(--verde); padding: 0 16px 14px; position: sticky; top: 0; z-index: 100; }
   .nav { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; padding-bottom: 2px; }
@@ -65,12 +131,12 @@
   .nav-btn { flex-shrink: 0; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.75); border: none; padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s; white-space: nowrap; }
   .nav-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
   .nav-btn.active { background: #fff; color: var(--verde); }
-
+ 
   /* ── LAYOUT ── */
   .container { max-width: 640px; margin: 0 auto; padding: 20px 16px 80px; }
   .section { display: none; }
   .section.visible { display: block; }
-
+ 
   /* ── PHOTO ── */
   .photo-banner { width: 100%; height: 180px; border-radius: var(--radius); overflow: hidden; position: relative; margin-bottom: 14px; }
   .photo-banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -79,7 +145,7 @@
   .photo-strip-item { border-radius: var(--radius-sm); overflow: hidden; height: 120px; position: relative; }
   .photo-strip-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .photo-strip-label { position: absolute; bottom: 0; left: 0; right: 0; padding: 6px 8px; background: linear-gradient(to top, rgba(10,30,20,0.7), transparent); color: rgba(255,255,255,0.9); font-size: 11px; font-weight: 600; }
-
+ 
   /* ── CARDS ── */
   .card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 18px 20px; margin-bottom: 14px; }
   .card-title { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--verde-mid); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
@@ -88,25 +154,25 @@
   .info-row:last-child { border-bottom: none; padding-bottom: 0; }
   .info-label { color: var(--text-muted); font-size: 14px; flex-shrink: 0; }
   .info-value { font-size: 14px; font-weight: 600; color: var(--text); text-align: right; }
-
+ 
   /* ── WIFI ── */
   .wifi-box { background: var(--verde-pale); border-radius: var(--radius-sm); padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
   .wifi-label { font-size: 12px; color: var(--verde-mid); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
   .wifi-val { font-size: 18px; font-weight: 700; color: var(--verde); font-family: 'SF Mono', monospace; }
   .wifi-copy { background: var(--verde); color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
-
+ 
   /* ── PILLS ── */
   .pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
   .pill-green { background: var(--verde-pale); color: #085041; }
   .pill-amber { background: var(--amber-pale); color: var(--amber); }
   .pill-purple { background: #EEEDFE; color: #3C3489; }
-
+ 
   /* ── CHECKLIST ── */
   .checklist { list-style: none; }
   .checklist li { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text); }
   .checklist li:last-child { border-bottom: none; }
   .check-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--verde-light); margin-top: 6px; flex-shrink: 0; }
-
+ 
   /* ── RESTAURANTS ── */
   .resto-grid { display: flex; flex-direction: column; gap: 12px; }
   .resto-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
@@ -128,7 +194,7 @@
   .et-pareja    { background: #FCE7F3; color: #9D174D; }
   .et-rapido    { background: #F1F5F9; color: #475569; }
   .et-reserva   { background: #FAEEDA; color: #854F0B; }
-
+ 
   /* ── ACTIVITIES ── */
   .act-grid { display: flex; flex-direction: column; gap: 12px; }
   .act-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
@@ -140,7 +206,7 @@
   .act-body p { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
   .act-tip { background: var(--amber-pale); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 13px; color: var(--amber); font-weight: 500; }
   .act-tip::before { content: '💡 '; }
-
+ 
   /* ── ITINERARY ── */
   .itin-day { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; }
   .itin-day-header { background: var(--verde); padding: 12px 18px; display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; }
@@ -156,7 +222,7 @@
   .itin-time { font-size: 11px; font-weight: 700; color: var(--verde-mid); min-width: 40px; padding-top: 2px; }
   .itin-text { font-size: 14px; color: var(--text); line-height: 1.5; }
   .itin-note { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
-
+ 
   /* ── SKI ── */
   .ski-hero { width: 100%; height: 200px; border-radius: var(--radius); overflow: hidden; position: relative; margin-bottom: 14px; }
   .ski-hero img { width: 100%; height: 100%; object-fit: cover; object-position: center 40%; }
@@ -168,7 +234,7 @@
   .ski-card .ski-icon { font-size: 24px; margin-bottom: 6px; }
   .ski-card h4 { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
   .ski-card p { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
-
+ 
   /* ── KIDS ── */
   .kids-grid { display: flex; flex-direction: column; gap: 12px; }
   .kids-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
@@ -177,7 +243,7 @@
   .kids-age { display: inline-block; background: var(--verde-pale); color: #085041; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .05em; }
   .kids-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
   .kids-card p { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
-
+ 
   /* ── BUTTONS ── */
   .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
   .link-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 999px; background: var(--verde); color: #fff; font-size: 12px; font-weight: 600; text-decoration: none; border: none; }
@@ -185,7 +251,7 @@
   .link-btn::after { content: '↗'; font-size: 11px; opacity: .8; }
   .link-btn-outline { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 999px; background: transparent; color: var(--verde-mid); font-size: 12px; font-weight: 600; text-decoration: none; border: 1.5px solid var(--verde-light); }
   .link-btn-outline::after { content: '↗'; font-size: 11px; opacity: .7; }
-
+ 
   /* ── MISC ── */
   .section-intro { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 18px; padding: 14px 16px; background: var(--white); border-radius: var(--radius-sm); border-left: 3px solid var(--verde-light); }
   .star-footer { background: var(--verde); border-radius: var(--radius); padding: 24px 20px; text-align: center; margin-top: 8px; }
@@ -198,20 +264,35 @@
 </style>
 </head>
 <body>
-
+ 
 <!-- ══════════════════════════════════
      PANTALLA DE SELECCIÓN DE IDIOMA
 ══════════════════════════════════ -->
 <div id="lang-screen">
   <div class="lang-volcano">🏔</div>
   <div class="lang-title">Depto. 308 · Pucón</div>
-  <div class="lang-sub">Elige tu idioma · Choose your language · Choisissez · Scegli</div>
+  <div class="lang-hook">Tu refugio en el sur de Chile</div>
+  <div class="lang-divider"></div>
+  <div class="lang-prompt">Para darte la mejor experiencia, elige tu idioma 👇</div>
+ 
+  <!-- Banner auto-detección -->
+  <div id="lang-detect-banner">
+    <span id="detect-text" class="detect-text">Detectamos inglés — ¿continuar en English?</span>
+    <button class="detect-yes" id="detect-yes-btn" onclick="acceptDetected()">Sí →</button>
+  </div>
+ 
   <div class="lang-grid">
-    <button class="lang-btn" onclick="setLang('es')">
+    <!-- Español destacado -->
+    <button class="lang-btn-primary" onclick="setLang('es')">
       <span class="lang-flag">🇨🇱</span>
-      <span class="lang-name">Español</span>
-      <span class="lang-native">Español</span>
+      <div class="lang-info">
+        <span class="lang-name">Español</span>
+        <span class="lang-native">Español</span>
+      </div>
+      <span class="lang-badge-rec">Recomendado</span>
     </button>
+ 
+    <!-- Otros idiomas -->
     <button class="lang-btn" onclick="setLang('en')">
       <span class="lang-flag">🇬🇧</span>
       <span class="lang-name">English</span>
@@ -227,12 +308,17 @@
       <span class="lang-name">Italiano</span>
       <span class="lang-native">Italiano</span>
     </button>
+    <button class="lang-btn" onclick="setLang('de')">
+      <span class="lang-flag">🇩🇪</span>
+      <span class="lang-name">Deutsch</span>
+      <span class="lang-native">Deutsch</span>
+    </button>
   </div>
 </div>
-
+ 
 <!-- Botón flotante para cambiar idioma -->
 <button id="lang-fab" onclick="document.getElementById('lang-screen').classList.remove('gone')">🌐 Idioma</button>
-
+ 
 <!-- ══════════════════════════════════
      HERO
 ══════════════════════════════════ -->
@@ -249,7 +335,7 @@
     </div>
   </div>
 </div>
-
+ 
 <!-- ══════════════════════════════════
      NAV
 ══════════════════════════════════ -->
@@ -264,9 +350,9 @@
     <button class="nav-btn" onclick="show('contacto',this)" id="nav-contact">📞 Contacto</button>
   </div>
 </div>
-
+ 
 <div class="container">
-
+ 
   <!-- DEPTO -->
   <div id="s-depto" class="section visible">
     <div class="photo-banner">
@@ -315,7 +401,7 @@
       <div class="info-row"><span class="info-label" id="t-volcan">Volcán Villarrica</span><span class="info-value" id="t-volcan-val">20 min en auto</span></div>
     </div>
   </div>
-
+ 
   <!-- NIÑOS -->
   <div id="s-ninos" class="section">
     <div class="section-intro" id="t-kids-intro">Pucón es un destino increíble para familias. Aquí van mis recomendaciones más honestas para que los niños la pasen increíble y los papás no la sufran.</div>
@@ -361,7 +447,7 @@
       </div>
     </div>
   </div>
-
+ 
   <!-- COMER -->
   <div id="s-comer" class="section">
     <div class="section-intro" id="t-eat-intro">Estos son los lugares donde realmente vale la pena comer en Pucón. No son recomendaciones de TripAdvisor — son los lugares donde yo como cuando estoy en Pucón.</div>
@@ -436,7 +522,7 @@
       </div>
     </div>
   </div>
-
+ 
   <!-- ACTIVIDADES -->
   <div id="s-actividades" class="section">
     <div class="act-grid">
@@ -482,7 +568,7 @@
       </div>
     </div>
   </div>
-
+ 
   <!-- ITINERARIO -->
   <div id="s-itinerario" class="section">
     <div class="photo-strip">
@@ -496,7 +582,7 @@
       </div>
     </div>
     <div class="section-intro" id="t-itin-intro">Una propuesta para 4 días, pensada para familias. No es rígida — úsala como punto de partida y ajústala a su ritmo.</div>
-
+ 
     <div class="itin-day">
       <div class="itin-day-header" onclick="toggleDay(this)">
         <div class="day-num">1</div>
@@ -553,7 +639,7 @@
       </div>
     </div>
   </div>
-
+ 
   <!-- SKI -->
   <div id="s-ski" class="section">
     <div class="ski-hero">
@@ -582,7 +668,7 @@
       </ul>
     </div>
   </div>
-
+ 
   <!-- CONTACTO -->
   <div id="s-contacto" class="section">
     <div class="card">
@@ -613,14 +699,36 @@
       <a class="contact-btn" href="https://airbnb.com" target="_blank" id="t-review-btn">Dejar reseña en Airbnb</a>
     </div>
   </div>
-
+ 
 </div>
 <div class="toast" id="toast">Copiado ✓</div>
-
+ 
 <script>
 // ══════════════════════════════════════
-// TRADUCCIONES
+// AUTO-DETECCIÓN DE IDIOMA
 // ══════════════════════════════════════
+const DETECT_MAP = {
+  'en': { lang: 'en', msg: 'We detected English — continue in English?', yes: 'Yes →' },
+  'fr': { lang: 'fr', msg: 'Nous avons détecté le français — continuer en français ?', yes: 'Oui →' },
+  'it': { lang: 'it', msg: 'Abbiamo rilevato l\'italiano — continuare in italiano?', yes: 'Sì →' },
+  'de': { lang: 'de', msg: 'Wir haben Deutsch erkannt — auf Deutsch fortfahren?', yes: 'Ja →' },
+};
+let detectedLang = null;
+ 
+(function detectBrowserLang() {
+  const nav = (navigator.language || navigator.userLanguage || '').toLowerCase().slice(0, 2);
+  if (DETECT_MAP[nav]) {
+    detectedLang = nav;
+    const info = DETECT_MAP[nav];
+    document.getElementById('detect-text').textContent = info.msg;
+    document.getElementById('detect-yes-btn').textContent = info.yes;
+    document.getElementById('lang-detect-banner').classList.add('visible');
+  }
+})();
+ 
+function acceptDetected() {
+  if (detectedLang) setLang(detectedLang);
+}
 const T = {
   es: {
     'hero-title':'Bienvenidos a su hogar en el sur ☀️','hero-loc':'Centro de Pucón','hero-lake':'A 5 min del lago','hero-fam':'Familiar',
@@ -837,9 +945,62 @@ const T = {
     't-checkout-card':'Prima di partire','t-co1':'Check-out entro le 12:00','t-co2':'Lasciare le chiavi alla portineria','t-co3':'Spegnere riscaldamento, luci e chiudere le finestre','t-co4':'Gettare la spazzatura nel condotto tra il 3° e 4° piano',
     't-review-title':'Com\'è andata?','t-review-body':'Sono cresciuto trascorrendo le estati a Pucón e spero che abbiate sentito la stessa magia. Se avete apprezzato il soggiorno, una recensione ci aiuta molto.','t-review-btn':'Lascia una recensione su Airbnb',
     'lang-fab':'🌐 Lingua'
+  },
+  de: {
+    'hero-title':'Willkommen in eurem Zuhause im Süden ☀️','hero-loc':'Zentrum von Pucón','hero-lake':'5 Min. zum See','hero-fam':'Familienfreundlich',
+    'nav-depto':'🏠 Die Wohnung','nav-ninos':'👶 Mit Kindern','nav-comer':'🍽 Essen gehen','nav-act':'🌋 Aktivitäten','nav-itin':'🗓 Reiseplan','nav-ski':'🎿 Schnee','nav-contact':'📞 Kontakt',
+    'cap-costanera':'📍 Seepromenade · 5 Min. zu Fuß von der Wohnung',
+    't-checkin-title':'Check-in und Zugang','t-checkin':'Check-in','t-checkin-val':'Ab 15:00 Uhr','t-checkout':'Check-out','t-checkout-val':'Bis 12:00 Uhr',
+    't-access':'Zugang','t-access-val':'24/7 Empfang — einfach Wohnung 308 nennen','t-parking':'Parkplatz','t-parking-val':'Platz 308 · im Gebäude',
+    't-wifi-net':'Netzwerk','t-wifi-pass':'Passwort','wifi-btn':'Passwort anzeigen',
+    't-how-title':'Wie alles funktioniert',
+    't-how1':'Gasheizung — ich erkläre es gerne in 1 Min. per WhatsApp',
+    't-how2':'Müll: Beutel durch den Schacht zwischen 3. und 4. Etage werfen',
+    't-how3':'Voll ausgestattete Küche: Utensilien, Kaffeemaschine, Mikrowelle, Ofen und Mixer',
+    't-how4':'Waschmaschine und Trockner im Gebäude verfügbar (2. Etage)',
+    't-how5':'Bettwäsche und Handtücher inklusive','t-how6':'Aufzug vorhanden',
+    't-loc-title':'Lage','t-loc-intro':'Die Lage ist einer der größten Vorteile der Wohnung — ihr könnt das Auto während eures gesamten Aufenthalts stehen lassen.',
+    't-loc-walk':'Ihr seid mitten im Zentrum von Pucón. Was ihr zu Fuß erreicht:',
+    't-super':'Supermarkt','t-super-val':'Direkt gegenüber','t-cafes':'Cafés und Restaurants','t-cafes-val':'2–5 Min. zu Fuß',
+    't-beach':'Hauptstrand','t-beach-val':'8 Min. zu Fuß','t-coast':'Promenade und See','t-coast-val':'5 Min. zu Fuß','t-volcan':'Vulkan Villarrica','t-volcan-val':'20 Min. mit dem Auto',
+    't-kids-intro':'Pucón ist ein fantastisches Ziel für Familien. Hier sind meine ehrlichen Empfehlungen, damit die Kinder eine großartige Zeit haben.',
+    't-age1':'0 – 5 Jahre','t-age2':'5 – 12 Jahre','t-age3':'6 + Jahre','t-age4':'Alle Altersgruppen',
+    't-playa-title':'🏖 Der Hauptstrand','t-playa-desc':'Der Hauptstrand des Sees hat auf der linken Seite eine Zone mit ruhigem, flachem Wasser — ideal für die Kleinen. Das Wasser erreicht im Sommer 18–20°C. Schwimmringe mitbringen, da es keine zuverlässige Vermietung in der Nähe gibt.',
+    't-raft-title':'🌊 Familien-Rafting auf dem Trancura','t-raft-desc':'Der Fluss Trancura hat zwei Abschnitte: der Untere (leicht, ab 6 Jahren) und der Obere (intensiver, ab 12 Jahren). Alle lokalen Anbieter liefern komplette Ausrüstung und Führer. Im Januar und Februar im Voraus buchen.',
+    't-huer-title':'🌲 Nationalpark Huerquehue','t-huer-desc':'Der Weg zu den Lagunen (Los Huaros) ist mit Kindern machbar und endet mit spektakulärem Ausblick. Hin und zurück ca. 4 Stunden. Snacks, Wasser und eine warme Jacke mitbringen — im Wald wird es kühler.','t-huer-btn':'Eintrittskarte CONAF buchen',
+    't-cost-title':'🦆 Promenade und Bootsfahrt','t-cost-desc':'Die Seepromenade am Nachmittag ist perfekt mit Kindern. Es gibt einen Bereich mit Enten und Schwänen, der die Kleinen begeistert. Vom Anleger fahren günstige Boote und Katamarane — ohne Reservierung.',
+    't-tips-badge':'⚠️ Wichtige Tipps','t-tips-title':'Gut zu wissen','t-tips-desc':'Die Sonne in Pucón ist im Sommer täuschend stark — Sonnencreme ist Pflicht. Im Januar und Februar füllt sich der Strand bis 17 Uhr, also vor 11 oder nach 18 Uhr hingehen. Der Vulkangipfel ist für Kinder unter 8 Jahren nicht empfohlen.',
+    't-eat-intro':'Das sind die Orte, die in Pucón wirklich einen Besuch wert sind. Keine TripAdvisor-Empfehlungen — das sind die Orte, wo ich esse, wenn ich hier bin.',
+    'f-todos':'Alle','f-desayuno':'☕ Frühstück','f-almuerzo':'🍽 Mittagessen','f-cena':'🌙 Abendessen','f-ninos':'👶 Mit Kindern','f-pareja':'🤍 Als Paar',
+    't-p-dist':'1 Block entfernt','t-p-desc':'Der beste Ort um den Tag zu beginnen. Spezialitätenkaffee, großzügige Toasts, frische Säfte. Immer ein lokales Publikum — nicht touristisch. Vor 10 Uhr kommen, um Wartezeiten zu vermeiden.',
+    't-tr-badge':'Bio','t-tr-desc':'Lokale Bio-Küche mit starker Mapuche-Identität. Die Frühstücke sind reichhaltig und gesund. Die Mittagskarte verwendet Zutaten von lokalen Produzenten. Eines meiner absoluten Lieblingsrestaurants.',
+    't-pc-badge':'Ideal für Familien','t-pc-desc':'Dünnkrustenpizza, gut gemacht. Perfekt zum entspannten Essen mit Kindern — abwechslungsreiche Karte, entspannte Atmosphäre und eine gute Auswahl an Craft-Bier für die Erwachsenen.',
+    't-br-badge':'Abend zu zweit','t-br-desc':'Für wenn die Kinder schlafen und die Eltern ein richtiges Abendessen genießen möchten. Einfallsreiche Küche, gute Cocktails und intime Atmosphäre. In der Hochsaison im Voraus reservieren.',
+    'et-breakfast':'Frühstück','et-breakfast2':'Frühstück','et-lunch':'Mittagessen','et-lunch2':'Mittagessen','et-dinner':'Abendessen','et-dinner2':'Abendessen','et-kids':'Mit Kindern','et-kids2':'Mit Kindern','et-kids3':'Mit Kindern','et-quick':'Schnell','et-couple':'Als Paar','et-res':'Reservierung empfohlen',
+    't-v-title':'🌋 Vulkan Villarrica','t-v-badge':'Ikonisch','t-v-desc':'Der vollständige Aufstieg ist für Erwachsene und Kinder über 12 Jahre. Die Familienvariante ist der CONAF-Aussichtspunktweg — man erreicht 1.400m mit atemberaubendem Ausblick ohne den Gipfelaufwand. Früh aufbrechen, um Wolken zu vermeiden.','t-v-tip':'Im Voraus einen zertifizierten Führer buchen. Im Sommer sind die Plätze schnell vergeben.',
+    't-tg-title':'♨️ Termas Geométricas','t-tg-badge':'Muss man gesehen haben','t-tg-desc':'Die spektakulärsten heißen Quellen der Region, 35 km von Pucón. 20 Warmwasserbecken in einem Farnschlucht. Perfekt für die ganze Familie.','t-tg-tip':'Wochentags hingehen, nicht am Wochenende. Um 11 Uhr ankommen, um alles zu nutzen. Online im Voraus buchen.',
+    't-rf-title':'🌊 Rafting auf dem Trancura','t-rf-badge':'Adrenalin','t-rf-desc':'Der untere Abschnitt des Trancura ist ideal für Familien — Klasse II und III, mit Führer und vollständiger Ausrüstung. Dauert etwa 2 Stunden.','t-rf-tip':'Beste Zeit: 10 Uhr morgens für mehr Wasservolumen und ruhigere Bedingungen vor dem Nachmittagswind.',
+    't-pn-title':'🌿 Nationalparks','t-pn-badge':'Natur','t-pn-desc':'Huerquehue ist der familienfreundlichste. Der Weg zu den Lagunen dauert 4h. Der Villarrica-Park hat kürzere Wege für kleine Kinder. Eintrittskarte online auf conaf.cl kaufen.','t-pn-tip':'Snacks, Wasser, Insektenschutz und eine warme Jacke mitbringen, auch wenn es in Pucón warm ist — im Wald ist es immer kühler.',
+    't-co-title':'🚗 Tagesausflug nach Coñaripe','t-co-badge':'Ausflug','t-co-desc':'50 km entfernt liegt eine völlig andere Welt: Coñaripe ist ein kleines Dorf am Calafquén-See, weit weniger touristisch als Pucón. Auf dem Weg können die Río Liquiñe oder Coñaripe-Thermalquellen besucht werden.','t-co-tip':'Die Seeuferstraße ist eine der schönsten Strecken der Araukanien — Zeit für Halte an Aussichtspunkten einplanen.',
+    't-strip1':'Tag 1 · Strand','t-strip3':'Tag 3 · Thermalquellen',
+    't-itin-intro':'Ein 4-Tage-Vorschlag für Familien. Nicht starr — als Ausgangspunkt nutzen und nach eigenem Tempo anpassen.',
+    't-d1-title':'Ankunft und erste Eindrücke','t-d1-sub':'Entspannen, erkunden, See','t-d1-1':'Check-in. Gepäck abstellen, WLAN verbinden.','t-d1-2':'Erster Spaziergang durchs Zentrum. Einkaufen im Supermarkt (gegenüber).','t-d1-2n':'Die Hauptstraße bietet Kunsthandwerk, Eisdielen und Geschäfte zum Stöbern.','t-d1-3':'Seepromenade. Die Kinder lernen das Wasser kennen.','t-d1-3n':'Wunderschönes Nachmittagslicht. Die Kinder zu den Schwänen mitnehmen.','t-d1-4':'Familienabendessen bei Pizza Cala.',
+    't-d2-title':'Vulkan und Strand','t-d2-sub':'Der ikonischste Tag','t-d2-1':'Frühes Frühstück bei Trawen.','t-d2-2':'Vulkanweg (Familienaussichtspunkt) oder Aufstieg für die Größeren.','t-d2-2n':'Früh aufbrechen — nachmittags ziehen oft Wolken auf.','t-d2-3':'Picknick mit Vulkanblick oder zurück im Ort.','t-d2-4':'Hauptstrand — ideale Zeit vor dem Nachmittagswind.','t-d2-5':'Ruhiges Abendessen. Nochmal Trawen oder zu Hause kochen.',
+    't-d3-title':'Termas Geométricas','t-d3-sub':'Der Lieblingstag aller','t-d3-1':'Schnelles Frühstück beim Café de la P.','t-d3-2':'Fahrt zu den Termas Geométricas (35 Min.).','t-d3-2n':'Wechselkleidung, Handtuch, Snacks mitbringen. Kleines Café vor Ort aber teuer.','t-d3-3':'Einlass. 4–5 Stunden mit 20 Becken erkunden.','t-d3-4':'Rückfahrt nach Pucón. Die Kinder schlafen im Auto.','t-d3-5':'Abendessen für Erwachsene bei By Roots (wenn die Kinder schlafen).',
+    't-d4-title':'Ausflug nach Coñaripe','t-d4-sub':'Abseits der ausgetretenen Pfade','t-d4-1':'Frühstück in der Wohnung und früher Aufbruch.','t-d4-2':'Seeuferstraße nach Coñaripe. An Aussichtspunkten halten.','t-d4-3':'Ankunft in Coñaripe. Strand am Calafquén-See — viel weniger Leute als in Pucón.','t-d4-4':'Mittagessen im Ort oder an den Coñaripe-Quellen auf dem Rückweg.','t-d4-5':'Rückkehr nach Pucón. Letzter Nachmittag im Zentrum oder am See.',
+    't-ski-title':'🎿 Pucón im Winter','t-ski-sub':'Ihr fahrt mit einer Gondel auf einen aktiven Vulkan. Einzigartig.',
+    't-ski1-t':'Skizentrum Villarrica-Pucón','t-ski1-d':'Am Hang des Vulkans. Pisten für alle Niveaus. Saison: Juni–September.',
+    't-ski2-t':'Ausrüstungsverleih','t-ski2-d':'Mehrere Geschäfte in der Hauptstraße. Bessere Preise im Ort als am Berg.',
+    't-ski3-t':'Skischule für Kinder','t-ski3-d':'Das Zentrum hat eine Skischule für Kinder ab 4 Jahren. Zertifizierte Lehrer und separater Anfängerbereich.',
+    't-ski4-t':'Thermalquellen nach dem Skifahren','t-ski4-d':'Ski + Thermalquellen am selben Tag: die beste Kombination eines südlichen Winters. Geométricas oder Huife.',
+    't-ski-tips-title':'Wintertipps',
+    't-sw1':'Unterkunft früh buchen — das Juliwochenende ist Wochen im Voraus ausgebucht','t-sw2':'Extra Thermokleidung mitbringen — der Wind am Berg ist intensiv','t-sw3':'Wochentage sind besser, um Warteschlangen an den Liften zu vermeiden','t-sw4':'Das Dorf ist im Winter ruhiger — Restaurants haben Tische ohne Wartezeit','t-sw5':'Gasheizung — ich erkläre die Bedienung beim Check-in',
+    't-contact-title':'Kontakt zum Gastgeber','t-host-label':'Gastgeber','t-emerg-title':'Notfälle in Pucón','t-police':'Polizei','t-fire':'Feuerwehr','t-ambu':'Krankenwagen / SAMU','t-hosp':'Krankenhaus Pucón',
+    't-checkout-card':'Vor der Abreise','t-co1':'Check-out bis 12:00 Uhr','t-co2':'Schlüssel am Empfang des Gebäudes abgeben','t-co3':'Heizung, Lichter ausschalten und Fenster schließen','t-co4':'Müll durch den Schacht zwischen 3. und 4. Etage entsorgen',
+    't-review-title':'Wie war euer Aufenthalt?','t-review-body':'Ich bin mit den Sommern in Pucón aufgewachsen und hoffe, dass ihr dieselbe Magie gespürt habt. Wenn euch der Aufenthalt gefallen hat, hilft uns eine Bewertung sehr.','t-review-btn':'Bewertung auf Airbnb hinterlassen',
+    'lang-fab':'🌐 Sprache'
   }
-};
-
+ 
 // ══════════════════════════════════════
 // APLICAR IDIOMA
 // ══════════════════════════════════════
@@ -860,7 +1021,7 @@ function setLang(lang) {
   // Scroll to top
   window.scrollTo(0, 0);
 }
-
+ 
 // ══════════════════════════════════════
 // WIFI
 // ══════════════════════════════════════
@@ -878,7 +1039,7 @@ function revealWifi() {
     wifiVisible.v = false;
   }
 }
-
+ 
 // ══════════════════════════════════════
 // NAV
 // ══════════════════════════════════════
@@ -889,14 +1050,14 @@ function show(id, btn) {
   btn.classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
+ 
 function toggleDay(header) {
   const body = header.nextElementSibling;
   const arrow = header.querySelector('.day-arrow');
   body.classList.toggle('open');
   arrow.classList.toggle('open');
 }
-
+ 
 function filtrar(tag, btn) {
   document.querySelectorAll('.filtro').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
