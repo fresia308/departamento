@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Depto 308 · Pucón</title>
+<style>
+  :root {
+    --verde: #1B4332; --verde-mid: #2D6A4F; --verde-light: #52B788;
+    --verde-pale: #E1F5EE; --crema: #F8F4EF; --amber: #854F0B;
+    --amber-pale: #FAEEDA; --text: #1a1a1a; --text-muted: #6B7280;
+    --border: #E5E7EB; --white: #ffffff; --radius: 14px; --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--crema); color: var(--text); font-size: 15px; line-height: 1.6; }
+
+  /* ── LANGUAGE SCREEN ── */
+  #lang-screen {
+    position: fixed; inset: 0; z-index: 9999;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: var(--verde); padding: 32px 24px;
+  }
+  #lang-screen.gone { display: none; }
+  .lang-volcano { font-size: 52px; margin-bottom: 12px; }
+  .lang-title { color: #fff; font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 4px; }
+  .lang-sub { color: #A8D5B5; font-size: 13px; text-align: center; margin-bottom: 32px; }
+  .lang-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; max-width: 320px; }
+  .lang-btn {
+    background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.2);
+    border-radius: var(--radius); padding: 20px 14px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    cursor: pointer; transition: all .2s;
+  }
+  .lang-btn:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.5); }
+  .lang-btn:active { transform: scale(0.97); }
+  .lang-flag { font-size: 34px; line-height: 1; }
+  .lang-name { color: #fff; font-size: 15px; font-weight: 600; }
+  .lang-native { color: #9FE1CB; font-size: 12px; }
+
+  /* ── LANG SWITCHER FLOTANTE ── */
+  #lang-fab {
+    position: fixed; bottom: 22px; right: 16px; z-index: 500;
+    background: var(--verde); color: #fff;
+    border: none; border-radius: 999px;
+    padding: 9px 16px; font-size: 13px; font-weight: 600;
+    cursor: pointer; display: none;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+  }
+
+  /* ── HERO ── */
+  .hero { position: relative; height: 320px; overflow: hidden; display: flex; align-items: flex-end; }
+  .hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 60%; }
+  .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,30,20,0.85) 0%, rgba(10,30,20,0.3) 60%, transparent 100%); }
+  .hero-content { position: relative; z-index: 2; padding: 0 22px 24px; width: 100%; }
+  .hero-badge { display: inline-block; background: rgba(82,183,136,0.3); color: #9FE1CB; font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: 4px 12px; border-radius: 999px; margin-bottom: 10px; border: 1px solid rgba(82,183,136,0.4); }
+  .hero h1 { color: #fff; font-size: 26px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; text-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+  .hero-meta { display: flex; gap: 14px; flex-wrap: wrap; }
+  .hero-meta span { color: rgba(255,255,255,0.85); font-size: 12px; display: flex; align-items: center; gap: 4px; }
+
+  /* ── NAV ── */
+  .nav-wrap { background: var(--verde); padding: 0 16px 14px; position: sticky; top: 0; z-index: 100; }
+  .nav { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; padding-bottom: 2px; }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-btn { flex-shrink: 0; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.75); border: none; padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s; white-space: nowrap; }
+  .nav-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+  .nav-btn.active { background: #fff; color: var(--verde); }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 640px; margin: 0 auto; padding: 20px 16px 80px; }
+  .section { display: none; }
+  .section.visible { display: block; }
+
+  /* ── PHOTO ── */
+  .photo-banner { width: 100%; height: 180px; border-radius: var(--radius); overflow: hidden; position: relative; margin-bottom: 14px; }
+  .photo-banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-banner-caption { position: absolute; bottom: 0; left: 0; right: 0; padding: 10px 14px; background: linear-gradient(to top, rgba(10,30,20,0.75), transparent); color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 600; }
+  .photo-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .photo-strip-item { border-radius: var(--radius-sm); overflow: hidden; height: 120px; position: relative; }
+  .photo-strip-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-strip-label { position: absolute; bottom: 0; left: 0; right: 0; padding: 6px 8px; background: linear-gradient(to top, rgba(10,30,20,0.7), transparent); color: rgba(255,255,255,0.9); font-size: 11px; font-weight: 600; }
+
+  /* ── CARDS ── */
+  .card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 18px 20px; margin-bottom: 14px; }
+  .card-title { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--verde-mid); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .card-title .icon { width: 28px; height: 28px; border-radius: 8px; background: var(--verde-pale); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); gap: 12px; }
+  .info-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .info-label { color: var(--text-muted); font-size: 14px; flex-shrink: 0; }
+  .info-value { font-size: 14px; font-weight: 600; color: var(--text); text-align: right; }
+
+  /* ── WIFI ── */
+  .wifi-box { background: var(--verde-pale); border-radius: var(--radius-sm); padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+  .wifi-label { font-size: 12px; color: var(--verde-mid); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  .wifi-val { font-size: 18px; font-weight: 700; color: var(--verde); font-family: 'SF Mono', monospace; }
+  .wifi-copy { background: var(--verde); color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+  /* ── PILLS ── */
+  .pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .pill-green { background: var(--verde-pale); color: #085041; }
+  .pill-amber { background: var(--amber-pale); color: var(--amber); }
+  .pill-purple { background: #EEEDFE; color: #3C3489; }
+
+  /* ── CHECKLIST ── */
+  .checklist { list-style: none; }
+  .checklist li { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text); }
+  .checklist li:last-child { border-bottom: none; }
+  .check-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--verde-light); margin-top: 6px; flex-shrink: 0; }
+
+  /* ── RESTAURANTS ── */
+  .resto-grid { display: flex; flex-direction: column; gap: 12px; }
+  .resto-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .resto-img { width: 100%; height: 140px; object-fit: cover; display: block; }
+  .resto-body { padding: 14px 16px; }
+  .resto-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+  .resto-name { font-size: 16px; font-weight: 700; color: var(--text); }
+  .resto-meal { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .resto-desc { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
+  .resto-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .filtro { padding: 7px 14px; border-radius: 999px; border: 1.5px solid var(--border); background: var(--white); color: var(--text-muted); font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; white-space: nowrap; }
+  .filtro:hover { border-color: var(--verde-light); color: var(--verde-mid); }
+  .filtro.active { background: var(--verde); color: #fff; border-color: var(--verde); }
+  .etiqueta { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; margin-right: 4px; margin-bottom: 4px; }
+  .et-desayuno { background: #FEF3C7; color: #92400E; }
+  .et-almuerzo  { background: #E1F5EE; color: #085041; }
+  .et-cena      { background: #EDE9FE; color: #4C1D95; }
+  .et-ninos     { background: #DBEAFE; color: #1E40AF; }
+  .et-pareja    { background: #FCE7F3; color: #9D174D; }
+  .et-rapido    { background: #F1F5F9; color: #475569; }
+  .et-reserva   { background: #FAEEDA; color: #854F0B; }
+
+  /* ── ACTIVITIES ── */
+  .act-grid { display: flex; flex-direction: column; gap: 12px; }
+  .act-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .act-img { width: 100%; height: 160px; object-fit: cover; display: block; }
+  .act-header { background: var(--verde); padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; }
+  .act-title { color: #fff; font-size: 15px; font-weight: 700; }
+  .act-badge { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); font-size: 11px; padding: 3px 8px; border-radius: 999px; font-weight: 600; }
+  .act-body { padding: 14px 18px; }
+  .act-body p { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
+  .act-tip { background: var(--amber-pale); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 13px; color: var(--amber); font-weight: 500; }
+  .act-tip::before { content: '💡 '; }
+
+  /* ── ITINERARY ── */
+  .itin-day { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; }
+  .itin-day-header { background: var(--verde); padding: 12px 18px; display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; }
+  .day-num { width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .day-title { color: #fff; font-size: 15px; font-weight: 600; flex: 1; }
+  .day-sub { color: #A8D5B5; font-size: 12px; }
+  .day-arrow { color: rgba(255,255,255,0.6); font-size: 12px; transition: transform .2s; }
+  .day-arrow.open { transform: rotate(180deg); }
+  .itin-body { padding: 16px 18px; display: none; }
+  .itin-body.open { display: block; }
+  .itin-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .itin-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .itin-time { font-size: 11px; font-weight: 700; color: var(--verde-mid); min-width: 40px; padding-top: 2px; }
+  .itin-text { font-size: 14px; color: var(--text); line-height: 1.5; }
+  .itin-note { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+
+  /* ── SKI ── */
+  .ski-hero { width: 100%; height: 200px; border-radius: var(--radius); overflow: hidden; position: relative; margin-bottom: 14px; }
+  .ski-hero img { width: 100%; height: 100%; object-fit: cover; object-position: center 40%; }
+  .ski-hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,30,20,0.8) 0%, rgba(10,30,20,0.2) 70%, transparent); display: flex; align-items: flex-end; padding: 18px; }
+  .ski-hero-text h3 { color: #fff; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .ski-hero-text p { color: #A8D5B5; font-size: 13px; }
+  .ski-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .ski-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; text-align: center; }
+  .ski-card .ski-icon { font-size: 24px; margin-bottom: 6px; }
+  .ski-card h4 { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .ski-card p { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+  /* ── KIDS ── */
+  .kids-grid { display: flex; flex-direction: column; gap: 12px; }
+  .kids-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .kids-img { width: 100%; height: 130px; object-fit: cover; display: block; }
+  .kids-body { padding: 14px 16px; }
+  .kids-age { display: inline-block; background: var(--verde-pale); color: #085041; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .05em; }
+  .kids-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .kids-card p { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+
+  /* ── BUTTONS ── */
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .link-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 999px; background: var(--verde); color: #fff; font-size: 12px; font-weight: 600; text-decoration: none; border: none; }
+  .link-btn::before { content: ''; display: inline-block; width: 14px; height: 14px; background: rgba(255,255,255,0.25); border-radius: 50%; flex-shrink: 0; }
+  .link-btn::after { content: '↗'; font-size: 11px; opacity: .8; }
+  .link-btn-outline { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 999px; background: transparent; color: var(--verde-mid); font-size: 12px; font-weight: 600; text-decoration: none; border: 1.5px solid var(--verde-light); }
+  .link-btn-outline::after { content: '↗'; font-size: 11px; opacity: .7; }
+
+  /* ── MISC ── */
+  .section-intro { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 18px; padding: 14px 16px; background: var(--white); border-radius: var(--radius-sm); border-left: 3px solid var(--verde-light); }
+  .star-footer { background: var(--verde); border-radius: var(--radius); padding: 24px 20px; text-align: center; margin-top: 8px; }
+  .star-footer h3 { color: #fff; font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .star-footer p { color: #A8D5B5; font-size: 14px; line-height: 1.6; margin-bottom: 16px; }
+  .star-row { font-size: 24px; letter-spacing: 4px; margin-bottom: 16px; }
+  .contact-btn { display: inline-block; background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 999px; padding: 10px 24px; font-size: 14px; font-weight: 600; text-decoration: none; }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text); color: #fff; padding: 10px 20px; border-radius: 999px; font-size: 13px; font-weight: 500; transition: transform .3s ease; z-index: 999; white-space: nowrap; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     PANTALLA DE SELECCIÓN DE IDIOMA
+══════════════════════════════════ -->
+<div id="lang-screen">
+  <div class="lang-volcano">🏔</div>
+  <div class="lang-title">Depto. 308 · Pucón</div>
+  <div class="lang-sub">Elige tu idioma · Choose your language · Choisissez · Scegli</div>
+  <div class="lang-grid">
+    <button class="lang-btn" onclick="setLang('es')">
+      <span class="lang-flag">🇨🇱</span>
+      <span class="lang-name">Español</span>
+      <span class="lang-native">Español</span>
+    </button>
+    <button class="lang-btn" onclick="setLang('en')">
+      <span class="lang-flag">🇬🇧</span>
+      <span class="lang-name">English</span>
+      <span class="lang-native">English</span>
+    </button>
+    <button class="lang-btn" onclick="setLang('fr')">
+      <span class="lang-flag">🇫🇷</span>
+      <span class="lang-name">Français</span>
+      <span class="lang-native">Français</span>
+    </button>
+    <button class="lang-btn" onclick="setLang('it')">
+      <span class="lang-flag">🇮🇹</span>
+      <span class="lang-name">Italiano</span>
+      <span class="lang-native">Italiano</span>
+    </button>
+  </div>
+</div>
+
+<!-- Botón flotante para cambiar idioma -->
+<button id="lang-fab" onclick="document.getElementById('lang-screen').classList.remove('gone')">🌐 Idioma</button>
+
+<!-- ══════════════════════════════════
+     HERO
+══════════════════════════════════ -->
+<div class="hero">
+  <img class="hero-img" src="hero.jpg" alt="Pucón" onerror="this.src='https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1400&q=80'">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-badge">Depto. 308 · Pucón</div>
+    <h1 id="hero-title">Bienvenidos a su hogar en el sur ☀️</h1>
+    <div class="hero-meta">
+      <span>📍 <b id="hero-loc">Centro de Pucón</b></span>
+      <span>⛱️ <b id="hero-lake">A 5 min del lago</b></span>
+      <span>👨‍👩‍👧‍👦 <b id="hero-fam">Familiar</b></span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     NAV
+══════════════════════════════════ -->
+<div class="nav-wrap">
+  <div class="nav">
+    <button class="nav-btn active" onclick="show('depto',this)" id="nav-depto">🏠 El depto.</button>
+    <button class="nav-btn" onclick="show('ninos',this)" id="nav-ninos">👶 Con niños</button>
+    <button class="nav-btn" onclick="show('comer',this)" id="nav-comer">🍽 Dónde comer</button>
+    <button class="nav-btn" onclick="show('actividades',this)" id="nav-act">🌋 Actividades</button>
+    <button class="nav-btn" onclick="show('itinerario',this)" id="nav-itin">🗓 Itinerario</button>
+    <button class="nav-btn" onclick="show('ski',this)" id="nav-ski">🎿 Nieve</button>
+    <button class="nav-btn" onclick="show('contacto',this)" id="nav-contact">📞 Contacto</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- DEPTO -->
+  <div id="s-depto" class="section visible">
+    <div class="photo-banner">
+      <img src="costanera.jpg" alt="Costanera" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Pucon_costanera.jpg/1280px-Pucon_costanera.jpg'">
+      <div class="photo-banner-caption" id="cap-costanera">📍 Costanera del lago · 5 min a pie desde el depto.</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">🔑</span><span id="t-checkin-title">Check-in y acceso</span></div>
+      <div class="info-row"><span class="info-label" id="t-checkin">Check-in</span><span class="info-value"><span class="pill pill-green" id="t-checkin-val">Desde las 15:00</span></span></div>
+      <div class="info-row"><span class="info-label" id="t-checkout">Check-out</span><span class="info-value"><span class="pill pill-amber" id="t-checkout-val">Hasta las 12:00</span></span></div>
+      <div class="info-row"><span class="info-label" id="t-access">Acceso</span><span class="info-value" id="t-access-val">Recepción 24/7 — solo indica depto. 308</span></div>
+      <div class="info-row"><span class="info-label" id="t-parking">Estacionamiento</span><span class="info-value" id="t-parking-val">Nro. 308 · dentro del recinto</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">📶</span> WiFi</div>
+      <div class="wifi-box" style="margin-bottom:10px;">
+        <div><div class="wifi-label" id="t-wifi-net">Red</div><div class="wifi-val">308</div></div>
+      </div>
+      <div class="wifi-box">
+        <div><div class="wifi-label" id="t-wifi-pass">Contraseña</div><div class="wifi-val" id="wpass">••••••••</div></div>
+        <button class="wifi-copy" id="wifi-btn" onclick="revealWifi()">Ver clave</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">🏠</span><span id="t-how-title">Cómo funciona todo</span></div>
+      <ul class="checklist">
+        <li><span class="check-dot"></span><span id="t-how1">Calefacción a gas — si la necesitas, te explico en 1 minuto por WhatsApp</span></li>
+        <li><span class="check-dot"></span><span id="t-how2">Basura: tirar las bolsas por el ducto en el entrepiso entre el piso 3 y 4</span></li>
+        <li><span class="check-dot"></span><span id="t-how3">Cocina equipada: utensilios, cafetera, microondas, horno y licuadora</span></li>
+        <li><span class="check-dot"></span><span id="t-how4">Lavadora y secadora disponibles en el edificio (piso 2)</span></li>
+        <li><span class="check-dot"></span><span id="t-how5">Sábanas y toallas incluidas</span></li>
+        <li><span class="check-dot"></span><span id="t-how6">Ascensor disponible</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">📍</span><span id="t-loc-title">Ubicación</span></div>
+      <p style="font-size:14px;color:var(--text-muted);margin-bottom:12px;" id="t-loc-intro">La ubicación es uno de los mayores diferenciales del depto: puedes olvidarte del auto durante la estadía.</p>
+      <div style="border-radius:14px;overflow:hidden;border:1px solid #E5E7EB;margin-bottom:14px;">
+        <iframe src="https://www.google.com/maps?q=Calle+Fresia+308,+Pucón,+Chile&output=embed" width="100%" height="220" style="border:0;display:block;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+      <p style="font-size:14px;color:var(--text-muted);margin-bottom:12px;" id="t-loc-walk">Estás en pleno centro de Pucón. Esto es lo que tienes caminando:</p>
+      <div class="info-row"><span class="info-label" id="t-super">Supermercado</span><span class="info-value"><span class="pill pill-green" id="t-super-val">Cruzando la calle</span></span></div>
+      <div class="info-row"><span class="info-label" id="t-cafes">Cafés y restoranes</span><span class="info-value" id="t-cafes-val">2–5 min a pie</span></div>
+      <div class="info-row"><span class="info-label" id="t-beach">Playa principal</span><span class="info-value" id="t-beach-val">8 min a pie</span></div>
+      <div class="info-row"><span class="info-label" id="t-coast">Costanera y lago</span><span class="info-value" id="t-coast-val">5 min a pie</span></div>
+      <div class="info-row"><span class="info-label" id="t-volcan">Volcán Villarrica</span><span class="info-value" id="t-volcan-val">20 min en auto</span></div>
+    </div>
+  </div>
+
+  <!-- NIÑOS -->
+  <div id="s-ninos" class="section">
+    <div class="section-intro" id="t-kids-intro">Pucón es un destino increíble para familias. Aquí van mis recomendaciones más honestas para que los niños la pasen increíble y los papás no la sufran.</div>
+    <div class="kids-grid">
+      <div class="kids-card">
+        <img class="kids-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Playa_de_Pucon.jpg/1280px-Playa_de_Pucon.jpg" alt="Playa" onerror="this.style.display='none'">
+        <div class="kids-body">
+          <div class="kids-age" id="t-age1">0 – 5 años</div>
+          <h4 id="t-playa-title">🏖 La playa principal</h4>
+          <p id="t-playa-desc">La playa principal del lago tiene una zona de aguas muy calmas y poca profundidad en el sector izquierdo entrando — ideal para los más chicos. El agua en verano llega a 18–20°C. Lleva flotadores porque no hay arriendo confiable cerca.</p>
+        </div>
+      </div>
+      <div class="kids-card">
+        <img class="kids-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Rafting_en_el_r%C3%ADo_Trancura%2C_Puc%C3%B3n.jpg/1280px-Rafting_en_el_r%C3%ADo_Trancura%2C_Puc%C3%B3n.jpg" alt="Rafting" onerror="this.style.display='none'">
+        <div class="kids-body">
+          <div class="kids-age" id="t-age2">5 – 12 años</div>
+          <h4 id="t-raft-title">🌊 Rafting familiar en el Trancura</h4>
+          <p id="t-raft-desc">El río Trancura tiene dos tramos: el Bajo (fácil, recomendado para niños desde 6 años) y el Alto (más adrenalínico, desde 12). Todas las empresas locales incluyen equipo completo y guía. Reservar con anticipación en enero y febrero.</p>
+        </div>
+      </div>
+      <div class="kids-card">
+        <img class="kids-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Huerquehue_National_Park.jpg/1280px-Huerquehue_National_Park.jpg" alt="Huerquehue" onerror="this.style.display='none'">
+        <div class="kids-body">
+          <div class="kids-age" id="t-age3">6 + años</div>
+          <h4 id="t-huer-title">🌲 Parque Nacional Huerquehue</h4>
+          <p id="t-huer-desc">El sendero a las lagunas (Los Huaros) es manejable con niños y termina en vistas espectaculares. Son 4 horas ida y vuelta. Llevar snacks, agua y ropa de abrigo — la temperatura baja en el bosque.</p>
+          <div class="btn-row"><a class="link-btn" href="https://www.conaf.cl/parques/parque-nacional-huerquehue/" target="_blank" id="t-huer-btn">Reservar entrada CONAF</a></div>
+        </div>
+      </div>
+      <div class="kids-card">
+        <div class="kids-body">
+          <div class="kids-age" id="t-age4">Todas las edades</div>
+          <h4 id="t-cost-title">🦆 Costanera y paseo en bote</h4>
+          <p id="t-cost-desc">El paseo por la costanera en la tarde es perfecto con niños. Hay un sector con patos y cisnes que enloquece a los más chicos. Desde el muelle salen botes y catamaranes con recorridos cortos — económicos y sin reserva.</p>
+        </div>
+      </div>
+      <div class="kids-card">
+        <div class="kids-body" style="background:#FFF8F0;border-radius:var(--radius);">
+          <div class="kids-age" style="background:var(--amber-pale);color:var(--amber);" id="t-tips-badge">⚠️ Tips importantes</div>
+          <h4 id="t-tips-title">Lo que hay que saber</h4>
+          <p id="t-tips-desc">El sol en Pucón pega fuerte en verano aunque no se sienta — protector solar es obligatorio. En enero y febrero la playa se llena hasta las 17:00, ir antes de las 11 o después de las 18. El volcán con niños menores de 8 no es recomendable por el esfuerzo físico.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMER -->
+  <div id="s-comer" class="section">
+    <div class="section-intro" id="t-eat-intro">Estos son los lugares donde realmente vale la pena comer en Pucón. No son recomendaciones de TripAdvisor — son los lugares donde yo como cuando estoy en Pucón.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+      <button class="filtro active" onclick="filtrar('todos',this)" id="f-todos">Todos</button>
+      <button class="filtro" onclick="filtrar('desayuno',this)" id="f-desayuno">☕ Desayuno</button>
+      <button class="filtro" onclick="filtrar('almuerzo',this)" id="f-almuerzo">🍽 Almuerzo</button>
+      <button class="filtro" onclick="filtrar('cena',this)" id="f-cena">🌙 Cena</button>
+      <button class="filtro" onclick="filtrar('ninos',this)" id="f-ninos">👶 Con niños</button>
+      <button class="filtro" onclick="filtrar('pareja',this)" id="f-pareja">🤍 En pareja</button>
+    </div>
+    <div class="resto-grid">
+      <div class="resto-card" data-tags="desayuno ninos rapido">
+        <img class="resto-img" src="cafe-la-p.jpg" alt="Café de la P" onerror="this.style.display='none'">
+        <div class="resto-body">
+          <div class="resto-header">
+            <div><div class="resto-name">Café de la P</div><div class="resto-meal">O'Higgins 483</div></div>
+            <span class="pill pill-green" id="t-p-dist">A 1 cuadra</span>
+          </div>
+          <p class="resto-desc" id="t-p-desc">El mejor lugar para partir el día. Café de especialidad, tostadas generosas, jugos naturales. Siempre hay ambiente local — no turístico. Llegar antes de las 10 para no esperar.</p>
+          <div class="resto-tags">
+            <span class="etiqueta et-desayuno" id="et-breakfast">Desayuno</span>
+            <span class="etiqueta et-ninos" id="et-kids">Con niños</span>
+            <span class="etiqueta et-rapido" id="et-quick">Rápido</span>
+          </div>
+        </div>
+      </div>
+      <div class="resto-card" data-tags="desayuno almuerzo ninos">
+        <img class="resto-img" src="trawen.jpeg" alt="Trawen" onerror="this.style.display='none'">
+        <div class="resto-body">
+          <div class="resto-header">
+            <div><div class="resto-name">Trawen</div><div class="resto-meal">Fresia 243</div></div>
+            <span class="pill pill-amber" id="t-tr-badge">Orgánico</span>
+          </div>
+          <p class="resto-desc" id="t-tr-desc">Cocina orgánica local en un ambiente con mucha identidad mapuche. Los desayunos son generosos y sanos. En el almuerzo tienen platos con ingredientes de productores de la zona. Uno de mis favoritos absolutos.</p>
+          <div class="resto-tags">
+            <span class="etiqueta et-desayuno" id="et-breakfast2">Desayuno</span>
+            <span class="etiqueta et-almuerzo" id="et-lunch">Almuerzo</span>
+            <span class="etiqueta et-ninos" id="et-kids2">Con niños</span>
+          </div>
+        </div>
+      </div>
+      <div class="resto-card" data-tags="almuerzo cena ninos">
+        <img class="resto-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Eq_it-na_pizza-margherita_sep2005_sml.jpg/1280px-Eq_it-na_pizza-margherita_sep2005_sml.jpg" alt="Pizza Cala" onerror="this.style.display='none'">
+        <div class="resto-body">
+          <div class="resto-header">
+            <div><div class="resto-name">Pizza Cala</div><div class="resto-meal">O'Higgins 524</div></div>
+            <span class="pill pill-green" id="t-pc-badge">Ideal familia</span>
+          </div>
+          <p class="resto-desc" id="t-pc-desc">Pizza de masa delgada, bien hecha. Perfecto para comer con niños sin estrés — carta variada, ambiente relajado, y una buena selección de cervezas artesanales para los adultos. Nunca defrauda.</p>
+          <div class="resto-tags">
+            <span class="etiqueta et-almuerzo" id="et-lunch2">Almuerzo</span>
+            <span class="etiqueta et-cena" id="et-dinner">Cena</span>
+            <span class="etiqueta et-ninos" id="et-kids3">Con niños</span>
+          </div>
+        </div>
+      </div>
+      <div class="resto-card" data-tags="cena pareja reserva">
+        <img class="resto-img" src="img/by-roots.jpg" alt="By Roots" onerror="this.style.display='none'">
+        <div class="resto-body">
+          <div class="resto-header">
+            <div><div class="resto-name">By Roots</div><div class="resto-meal">Fresia 128</div></div>
+            <span class="pill pill-purple" id="t-br-badge">Para la noche</span>
+          </div>
+          <p class="resto-desc" id="t-br-desc">Para cuando los niños ya durmieron y los papás quieren una cena de verdad. Cocina con personalidad, buenos tragos y ambiente íntimo. Reservar con anticipación en temporada alta.</p>
+          <div class="resto-tags">
+            <span class="etiqueta et-cena" id="et-dinner2">Cena</span>
+            <span class="etiqueta et-pareja" id="et-couple">En pareja</span>
+            <span class="etiqueta et-reserva" id="et-res">Reserva recomendada</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIVIDADES -->
+  <div id="s-actividades" class="section">
+    <div class="act-grid">
+      <div class="act-card">
+        <img class="act-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Puc%C3%B3n%2C_la_poza_con_el_volc%C3%A1n_Villarrica_al_fondo.jpg/1280px-Puc%C3%B3n%2C_la_poza_con_el_volc%C3%A1n_Villarrica_al_fondo.jpg" alt="Volcán" onerror="this.style.display='none'">
+        <div class="act-header"><span class="act-title" id="t-v-title">🌋 Volcán Villarrica</span><span class="act-badge" id="t-v-badge">Icónico</span></div>
+        <div class="act-body">
+          <p id="t-v-desc">La ascensión completa es para adultos y niños mayores de 12. La alternativa para familias es el sendero a los miradores del CONAF — se llega a los 1.400 msnm con vistas increíbles sin el esfuerzo del cráter. Salir temprano para evitar nubes.</p>
+          <div class="act-tip" id="t-v-tip">Reservar guía certificado con anticipación. En verano se agotan rápido los cupos.</div>
+        </div>
+      </div>
+      <div class="act-card">
+        <img class="act-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Termas_geometricas.jpg/1280px-Termas_geometricas.jpg" alt="Termas" onerror="this.style.display='none'">
+        <div class="act-header"><span class="act-title" id="t-tg-title">♨️ Termas Geométricas</span><span class="act-badge" id="t-tg-badge">Imperdible</span></div>
+        <div class="act-body">
+          <p id="t-tg-desc">Las termas más espectaculares de la zona, a 35 km de Pucón. 20 piscinas de agua caliente en un cañón de helechos. Perfecto para toda la familia. Hay piscinas con diferentes temperaturas — los niños adoran explorarlas.</p>
+          <div class="act-tip" id="t-tg-tip">Ir en semana, no fin de semana. Entrar a las 11 AM para aprovechar bien. Reservar online con anticipación.</div>
+        </div>
+      </div>
+      <div class="act-card">
+        <img class="act-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Rafting_en_el_r%C3%ADo_Trancura%2C_Puc%C3%B3n.jpg/1280px-Rafting_en_el_r%C3%ADo_Trancura%2C_Puc%C3%B3n.jpg" alt="Rafting" onerror="this.style.display='none'">
+        <div class="act-header"><span class="act-title" id="t-rf-title">🌊 Rafting río Trancura</span><span class="act-badge" id="t-rf-badge">Adrenalina</span></div>
+        <div class="act-body">
+          <p id="t-rf-desc">El tramo Bajo del Trancura es ideal para familias — class II y III, con guía y equipo incluido. Dura unas 2 horas y termina en un asado junto al río en muchas empresas. Hay varias operadoras en el camino al volcán.</p>
+          <div class="act-tip" id="t-rf-tip">El mejor horario es a las 10 AM para tener el río con más volumen y más tranquilo antes del viento de la tarde.</div>
+        </div>
+      </div>
+      <div class="act-card">
+        <img class="act-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Huerquehue_National_Park.jpg/1280px-Huerquehue_National_Park.jpg" alt="Huerquehue" onerror="this.style.display='none'">
+        <div class="act-header"><span class="act-title" id="t-pn-title">🌿 Parques Nacionales</span><span class="act-badge" id="t-pn-badge">Naturaleza</span></div>
+        <div class="act-body">
+          <p id="t-pn-desc">Huerquehue es el más accesible para familias. El sendero a Laguna Los Huaros toma 4h y es manejable. También está el Parque Villarrica, con senderos más cortos y aptos para niños chicos. Pagar entrada en línea en conaf.cl.</p>
+          <div class="act-tip" id="t-pn-tip">Llevar snacks, agua, repelente y ropa de abrigo aunque haga calor en Pucón — en el bosque siempre está más fresco.</div>
+        </div>
+      </div>
+      <div class="act-card">
+        <img class="act-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Lago_Calafquen.jpg/1280px-Lago_Calafquen.jpg" alt="Coñaripe" onerror="this.style.display='none'">
+        <div class="act-header"><span class="act-title" id="t-co-title">🚗 Día en Coñaripe</span><span class="act-badge" id="t-co-badge">Excursión</span></div>
+        <div class="act-body">
+          <p id="t-co-desc">A 50 km hay un mundo diferente: Coñaripe es un pueblo pequeño junto al Lago Calafquén, mucho menos turístico que Pucón. De paso se pueden visitar las Termas Río Liquiñe o las de Coñaripe. Un día perfecto para salir de la ruta habitual.</p>
+          <div class="act-tip" id="t-co-tip">La ruta por el borde del lago es uno de los tramos más lindos de la Araucanía — ir con tiempo para parar en miradores.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ITINERARIO -->
+  <div id="s-itinerario" class="section">
+    <div class="photo-strip">
+      <div class="photo-strip-item">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Playa_de_Pucon.jpg/640px-Playa_de_Pucon.jpg" alt="Playa" onerror="this.style.background='#1B4332'">
+        <div class="photo-strip-label" id="t-strip1">Día 1 · Playa</div>
+      </div>
+      <div class="photo-strip-item">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Termas_geometricas.jpg/640px-Termas_geometricas.jpg" alt="Termas" onerror="this.style.background='#2D6A4F'">
+        <div class="photo-strip-label" id="t-strip3">Día 3 · Termas</div>
+      </div>
+    </div>
+    <div class="section-intro" id="t-itin-intro">Una propuesta para 4 días, pensada para familias. No es rígida — úsala como punto de partida y ajústala a su ritmo.</div>
+
+    <div class="itin-day">
+      <div class="itin-day-header" onclick="toggleDay(this)">
+        <div class="day-num">1</div>
+        <div><div class="day-title" id="t-d1-title">Llegada y primer contacto</div><div class="day-sub" id="t-d1-sub">Calma, exploración, lago</div></div>
+        <span class="day-arrow">▼</span>
+      </div>
+      <div class="itin-body">
+        <div class="itin-item"><div class="itin-time">15:00</div><div><div class="itin-text" id="t-d1-1">Check-in en el depto. Dejar las maletas, conectar el WiFi.</div></div></div>
+        <div class="itin-item"><div class="itin-time">16:00</div><div><div class="itin-text" id="t-d1-2">Primer paseo por el centro. Compras en el super (cruzando la calle).</div><div class="itin-note" id="t-d1-2n">La calle principal tiene artesanía, heladerías y tiendas para curiosear.</div></div></div>
+        <div class="itin-item"><div class="itin-time">18:00</div><div><div class="itin-text" id="t-d1-3">Costanera y lago. Los niños conocen el agua.</div><div class="itin-note" id="t-d1-3n">El sol de tarde es hermoso. Llevar a los niños a ver los cisnes.</div></div></div>
+        <div class="itin-item"><div class="itin-time">20:30</div><div><div class="itin-text" id="t-d1-4">Cena familiar en Pizza Cala.</div></div></div>
+      </div>
+    </div>
+    <div class="itin-day">
+      <div class="itin-day-header" onclick="toggleDay(this)">
+        <div class="day-num">2</div>
+        <div><div class="day-title" id="t-d2-title">Volcán y playa</div><div class="day-sub" id="t-d2-sub">El día más emblemático</div></div>
+        <span class="day-arrow">▼</span>
+      </div>
+      <div class="itin-body">
+        <div class="itin-item"><div class="itin-time">08:30</div><div><div class="itin-text" id="t-d2-1">Desayuno temprano en Trawen.</div></div></div>
+        <div class="itin-item"><div class="itin-time">10:00</div><div><div class="itin-text" id="t-d2-2">Sendero del volcán (mirador familia) o ascensión para los más grandes.</div><div class="itin-note" id="t-d2-2n">Salir temprano — de tarde se nubla frecuentemente.</div></div></div>
+        <div class="itin-item"><div class="itin-time">13:30</div><div><div class="itin-text" id="t-d2-3">Almuerzo picnic con vista al volcán o de regreso en el pueblo.</div></div></div>
+        <div class="itin-item"><div class="itin-time">16:00</div><div><div class="itin-text" id="t-d2-4">Playa principal — hora ideal antes del viento de tarde.</div></div></div>
+        <div class="itin-item"><div class="itin-time">20:00</div><div><div class="itin-text" id="t-d2-5">Cena tranquila. Trawen si quieren repetir, o cocinar en casa.</div></div></div>
+      </div>
+    </div>
+    <div class="itin-day">
+      <div class="itin-day-header" onclick="toggleDay(this)">
+        <div class="day-num">3</div>
+        <div><div class="day-title" id="t-d3-title">Termas Geométricas</div><div class="day-sub" id="t-d3-sub">El día favorito de todos</div></div>
+        <span class="day-arrow">▼</span>
+      </div>
+      <div class="itin-body">
+        <div class="itin-item"><div class="itin-time">09:00</div><div><div class="itin-text" id="t-d3-1">Desayuno rápido en Café de la P.</div></div></div>
+        <div class="itin-item"><div class="itin-time">10:00</div><div><div class="itin-text" id="t-d3-2">Salida hacia Termas Geométricas (35 min en auto).</div><div class="itin-note" id="t-d3-2n">Llevar ropa de cambio, toalla, snacks. Hay pequeño café adentro pero caro.</div></div></div>
+        <div class="itin-item"><div class="itin-time">11:00</div><div><div class="itin-text" id="t-d3-3">Entrada a las termas. Tardes de 4–5 horas explorando las 20 piscinas.</div></div></div>
+        <div class="itin-item"><div class="itin-time">15:30</div><div><div class="itin-text" id="t-d3-4">Regreso a Pucón. Los niños van a dormir en el auto.</div></div></div>
+        <div class="itin-item"><div class="itin-time">21:00</div><div><div class="itin-text" id="t-d3-5">Cena para adultos en By Roots (si los niños ya duermen).</div></div></div>
+      </div>
+    </div>
+    <div class="itin-day">
+      <div class="itin-day-header" onclick="toggleDay(this)">
+        <div class="day-num">4</div>
+        <div><div class="day-title" id="t-d4-title">Excursión a Coñaripe</div><div class="day-sub" id="t-d4-sub">Off the beaten path</div></div>
+        <span class="day-arrow">▼</span>
+      </div>
+      <div class="itin-body">
+        <div class="itin-item"><div class="itin-time">09:30</div><div><div class="itin-text" id="t-d4-1">Desayuno en el depto. y salida temprana.</div></div></div>
+        <div class="itin-item"><div class="itin-time">10:30</div><div><div class="itin-text" id="t-d4-2">Ruta por el borde del lago hacia Coñaripe. Parar en miradores.</div></div></div>
+        <div class="itin-item"><div class="itin-time">12:00</div><div><div class="itin-text" id="t-d4-3">Llegada a Coñaripe. Playa del Lago Calafquén — mucho menos gente que Pucón.</div></div></div>
+        <div class="itin-item"><div class="itin-time">14:00</div><div><div class="itin-text" id="t-d4-4">Almuerzo en el pueblo o Termas de Coñaripe de camino.</div></div></div>
+        <div class="itin-item"><div class="itin-time">17:00</div><div><div class="itin-text" id="t-d4-5">Regreso a Pucón. Última tarde en el centro o lago.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SKI -->
+  <div id="s-ski" class="section">
+    <div class="ski-hero">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Ski_Pucon.jpg/1280px-Ski_Pucon.jpg" alt="Ski Pucón" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Villarrica_volcano_snow.jpg/1280px-Villarrica_volcano_snow.jpg'">
+      <div class="ski-hero-overlay">
+        <div class="ski-hero-text">
+          <h3 id="t-ski-title">🎿 Pucón en invierno</h3>
+          <p id="t-ski-sub">Subes en teleférico a un volcán activo. No hay nada igual.</p>
+        </div>
+      </div>
+    </div>
+    <div class="ski-grid">
+      <div class="ski-card"><div class="ski-icon">🚡</div><h4 id="t-ski1-t">Centro de Ski Villarrica-Pucón</h4><p id="t-ski1-d">En la ladera del volcán. Pistas para todos los niveles. Temporada junio–septiembre.</p></div>
+      <div class="ski-card"><div class="ski-icon">🎿</div><h4 id="t-ski2-t">Arriendo de equipos</h4><p id="t-ski2-d">Hay varias tiendas en la calle principal. El precio conviene más en el pueblo que en el cerro.</p></div>
+      <div class="ski-card"><div class="ski-icon">👶</div><h4 id="t-ski3-t">Ski para niños</h4><p id="t-ski3-d">El centro tiene escuela de ski para niños desde 4 años. Instructores certificados y zona aparte.</p></div>
+      <div class="ski-card"><div class="ski-icon">♨️</div><h4 id="t-ski4-t">Termas después del ski</h4><p id="t-ski4-d">El combo ski + termas en el mismo día es lo mejor del invierno sureño. Geométricas o Huife.</p></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">💡</span><span id="t-ski-tips-title">Tips de invierno</span></div>
+      <ul class="checklist">
+        <li><span class="check-dot"></span><span id="t-sw1">Reservar alojamiento con anticipación — el puente de julio se llena en semanas</span></li>
+        <li><span class="check-dot"></span><span id="t-sw2">Llevar ropa térmica adicional — el viento en el cerro es intenso</span></li>
+        <li><span class="check-dot"></span><span id="t-sw3">Los días de semana son mejores para evitar filas en los lifts</span></li>
+        <li><span class="check-dot"></span><span id="t-sw4">El pueblo en invierno es más tranquilo — restaurantes con mesas sin espera</span></li>
+        <li><span class="check-dot"></span><span id="t-sw5">La calefacción del depto. es a gas — el encendido lo explico yo al check-in</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CONTACTO -->
+  <div id="s-contacto" class="section">
+    <div class="card">
+      <div class="card-title"><span class="icon">📞</span><span id="t-contact-title">Contacto del anfitrión</span></div>
+      <div class="info-row"><span class="info-label" id="t-host-label">Anfitrión</span><span class="info-value">Marcelo Caro</span></div>
+      <div class="info-row"><span class="info-label">WhatsApp</span><a href="https://wa.me/56951061925?text=Hola%20Marcelo%2C%20estoy%20en%20el%20depto%20308%20y%20necesito%20ayuda" style="color:var(--verde-mid);font-weight:600;text-decoration:none;">+56 9 5106 1925</a></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">🚨</span><span id="t-emerg-title">Emergencias en Pucón</span></div>
+      <div class="info-row"><span class="info-label" id="t-police">Carabineros</span><span class="info-value">133</span></div>
+      <div class="info-row"><span class="info-label" id="t-fire">Bomberos</span><span class="info-value">132</span></div>
+      <div class="info-row"><span class="info-label" id="t-ambu">Ambulancia / SAMU</span><span class="info-value">131</span></div>
+      <div class="info-row"><span class="info-label" id="t-hosp">Hospital de Pucón</span><span class="info-value">+56 45 244 1177</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">✅</span><span id="t-checkout-card">Antes de salir</span></div>
+      <ul class="checklist">
+        <li><span class="check-dot"></span><span id="t-co1">Check-out hasta las 12:00</span></li>
+        <li><span class="check-dot"></span><span id="t-co2">Dejar las llaves en recepción del edificio</span></li>
+        <li><span class="check-dot"></span><span id="t-co3">Apagar calefacción, luces y cerrar ventanas</span></li>
+        <li><span class="check-dot"></span><span id="t-co4">Tirar la basura por el ducto del entrepiso 3–4</span></li>
+      </ul>
+    </div>
+    <div class="star-footer">
+      <h3 id="t-review-title">¿Cómo estuvo todo?</h3>
+      <p id="t-review-body">Crecí veraneando en Pucón y espero que hayan sentido esa misma magia. Si disfrutaron la estadía, una reseña nos ayuda un montón a seguir mejorando.</p>
+      <div class="star-row">⭐⭐⭐⭐⭐</div>
+      <a class="contact-btn" href="https://airbnb.com" target="_blank" id="t-review-btn">Dejar reseña en Airbnb</a>
+    </div>
+  </div>
+
+</div>
+<div class="toast" id="toast">Copiado ✓</div>
+
+<script>
+// ══════════════════════════════════════
+// TRADUCCIONES
+// ══════════════════════════════════════
+const T = {
+  es: {
+    'hero-title':'Bienvenidos a su hogar en el sur ☀️','hero-loc':'Centro de Pucón','hero-lake':'A 5 min del lago','hero-fam':'Familiar',
+    'nav-depto':'🏠 El depto.','nav-ninos':'👶 Con niños','nav-comer':'🍽 Dónde comer','nav-act':'🌋 Actividades','nav-itin':'🗓 Itinerario','nav-ski':'🎿 Nieve','nav-contact':'📞 Contacto',
+    'cap-costanera':'📍 Costanera del lago · 5 min a pie desde el depto.',
+    't-checkin-title':'Check-in y acceso','t-checkin':'Check-in','t-checkin-val':'Desde las 15:00','t-checkout':'Check-out','t-checkout-val':'Hasta las 12:00',
+    't-access':'Acceso','t-access-val':'Recepción 24/7 — solo indica depto. 308','t-parking':'Estacionamiento','t-parking-val':'Nro. 308 · dentro del recinto',
+    't-wifi-net':'Red','t-wifi-pass':'Contraseña','wifi-btn':'Ver clave',
+    't-how-title':'Cómo funciona todo',
+    't-how1':'Calefacción a gas — si la necesitas, te explico en 1 minuto por WhatsApp',
+    't-how2':'Basura: tirar las bolsas por el ducto en el entrepiso entre el piso 3 y 4',
+    't-how3':'Cocina equipada: utensilios, cafetera, microondas, horno y licuadora',
+    't-how4':'Lavadora y secadora disponibles en el edificio (piso 2)',
+    't-how5':'Sábanas y toallas incluidas','t-how6':'Ascensor disponible',
+    't-loc-title':'Ubicación','t-loc-intro':'La ubicación es uno de los mayores diferenciales del depto: puedes olvidarte del auto durante la estadía.',
+    't-loc-walk':'Estás en pleno centro de Pucón. Esto es lo que tienes caminando:',
+    't-super':'Supermercado','t-super-val':'Cruzando la calle','t-cafes':'Cafés y restoranes','t-cafes-val':'2–5 min a pie',
+    't-beach':'Playa principal','t-beach-val':'8 min a pie','t-coast':'Costanera y lago','t-coast-val':'5 min a pie','t-volcan':'Volcán Villarrica','t-volcan-val':'20 min en auto',
+    't-kids-intro':'Pucón es un destino increíble para familias. Aquí van mis recomendaciones más honestas para que los niños la pasen increíble y los papás no la sufran.',
+    't-age1':'0 – 5 años','t-age2':'5 – 12 años','t-age3':'6 + años','t-age4':'Todas las edades',
+    't-playa-title':'🏖 La playa principal','t-playa-desc':'La playa principal del lago tiene una zona de aguas muy calmas y poca profundidad en el sector izquierdo entrando — ideal para los más chicos. El agua en verano llega a 18–20°C. Lleva flotadores porque no hay arriendo confiable cerca.',
+    't-raft-title':'🌊 Rafting familiar en el Trancura','t-raft-desc':'El río Trancura tiene dos tramos: el Bajo (fácil, recomendado para niños desde 6 años) y el Alto (más adrenalínico, desde 12). Todas las empresas locales incluyen equipo completo y guía. Reservar con anticipación en enero y febrero.',
+    't-huer-title':'🌲 Parque Nacional Huerquehue','t-huer-desc':'El sendero a las lagunas (Los Huaros) es manejable con niños y termina en vistas espectaculares. Son 4 horas ida y vuelta. Llevar snacks, agua y ropa de abrigo — la temperatura baja en el bosque.','t-huer-btn':'Reservar entrada CONAF',
+    't-cost-title':'🦆 Costanera y paseo en bote','t-cost-desc':'El paseo por la costanera en la tarde es perfecto con niños. Hay un sector con patos y cisnes que enloquece a los más chicos. Desde el muelle salen botes y catamaranes con recorridos cortos — económicos y sin reserva.',
+    't-tips-badge':'⚠️ Tips importantes','t-tips-title':'Lo que hay que saber','t-tips-desc':'El sol en Pucón pega fuerte en verano aunque no se sienta — protector solar es obligatorio. En enero y febrero la playa se llena hasta las 17:00, ir antes de las 11 o después de las 18. El volcán con niños menores de 8 no es recomendable por el esfuerzo físico.',
+    't-eat-intro':'Estos son los lugares donde realmente vale la pena comer en Pucón. No son recomendaciones de TripAdvisor — son los lugares donde yo como cuando estoy en Pucón.',
+    'f-todos':'Todos','f-desayuno':'☕ Desayuno','f-almuerzo':'🍽 Almuerzo','f-cena':'🌙 Cena','f-ninos':'👶 Con niños','f-pareja':'🤍 En pareja',
+    't-p-dist':'A 1 cuadra','t-p-desc':'El mejor lugar para partir el día. Café de especialidad, tostadas generosas, jugos naturales. Siempre hay ambiente local — no turístico. Llegar antes de las 10 para no esperar.',
+    't-tr-badge':'Orgánico','t-tr-desc':'Cocina orgánica local en un ambiente con mucha identidad mapuche. Los desayunos son generosos y sanos. En el almuerzo tienen platos con ingredientes de productores de la zona. Uno de mis favoritos absolutos.',
+    't-pc-badge':'Ideal familia','t-pc-desc':'Pizza de masa delgada, bien hecha. Perfecto para comer con niños sin estrés — carta variada, ambiente relajado, y una buena selección de cervezas artesanales para los adultos. Nunca defrauda.',
+    't-br-badge':'Para la noche','t-br-desc':'Para cuando los niños ya durmieron y los papás quieren una cena de verdad. Cocina con personalidad, buenos tragos y ambiente íntimo. Reservar con anticipación en temporada alta.',
+    'et-breakfast':'Desayuno','et-breakfast2':'Desayuno','et-lunch':'Almuerzo','et-lunch2':'Almuerzo','et-dinner':'Cena','et-dinner2':'Cena','et-kids':'Con niños','et-kids2':'Con niños','et-kids3':'Con niños','et-quick':'Rápido','et-couple':'En pareja','et-res':'Reserva recomendada',
+    't-v-title':'🌋 Volcán Villarrica','t-v-badge':'Icónico','t-v-desc':'La ascensión completa es para adultos y niños mayores de 12. La alternativa para familias es el sendero a los miradores del CONAF — se llega a los 1.400 msnm con vistas increíbles sin el esfuerzo del cráter. Salir temprano para evitar nubes.','t-v-tip':'Reservar guía certificado con anticipación. En verano se agotan rápido los cupos.',
+    't-tg-title':'♨️ Termas Geométricas','t-tg-badge':'Imperdible','t-tg-desc':'Las termas más espectaculares de la zona, a 35 km de Pucón. 20 piscinas de agua caliente en un cañón de helechos. Perfecto para toda la familia. Hay piscinas con diferentes temperaturas — los niños adoran explorarlas.','t-tg-tip':'Ir en semana, no fin de semana. Entrar a las 11 AM para aprovechar bien. Reservar online con anticipación.',
+    't-rf-title':'🌊 Rafting río Trancura','t-rf-badge':'Adrenalina','t-rf-desc':'El tramo Bajo del Trancura es ideal para familias — class II y III, con guía y equipo incluido. Dura unas 2 horas y termina en un asado junto al río en muchas empresas.','t-rf-tip':'El mejor horario es a las 10 AM para tener el río con más volumen y más tranquilo antes del viento de la tarde.',
+    't-pn-title':'🌿 Parques Nacionales','t-pn-badge':'Naturaleza','t-pn-desc':'Huerquehue es el más accesible para familias. El sendero a Laguna Los Huaros toma 4h y es manejable. También está el Parque Villarrica, con senderos más cortos y aptos para niños chicos. Pagar entrada en línea en conaf.cl.','t-pn-tip':'Llevar snacks, agua, repelente y ropa de abrigo aunque haga calor en Pucón — en el bosque siempre está más fresco.',
+    't-co-title':'🚗 Día en Coñaripe','t-co-badge':'Excursión','t-co-desc':'A 50 km hay un mundo diferente: Coñaripe es un pueblo pequeño junto al Lago Calafquén, mucho menos turístico que Pucón. De paso se pueden visitar las Termas Río Liquiñe o las de Coñaripe.','t-co-tip':'La ruta por el borde del lago es uno de los tramos más lindos de la Araucanía — ir con tiempo para parar en miradores.',
+    't-strip1':'Día 1 · Playa','t-strip3':'Día 3 · Termas',
+    't-itin-intro':'Una propuesta para 4 días, pensada para familias. No es rígida — úsala como punto de partida y ajústala a su ritmo.',
+    't-d1-title':'Llegada y primer contacto','t-d1-sub':'Calma, exploración, lago','t-d1-1':'Check-in en el depto. Dejar las maletas, conectar el WiFi.','t-d1-2':'Primer paseo por el centro. Compras en el super (cruzando la calle).','t-d1-2n':'La calle principal tiene artesanía, heladerías y tiendas para curiosear.','t-d1-3':'Costanera y lago. Los niños conocen el agua.','t-d1-3n':'El sol de tarde es hermoso. Llevar a los niños a ver los cisnes.','t-d1-4':'Cena familiar en Pizza Cala.',
+    't-d2-title':'Volcán y playa','t-d2-sub':'El día más emblemático','t-d2-1':'Desayuno temprano en Trawen.','t-d2-2':'Sendero del volcán (mirador familia) o ascensión para los más grandes.','t-d2-2n':'Salir temprano — de tarde se nubla frecuentemente.','t-d2-3':'Almuerzo picnic con vista al volcán o de regreso en el pueblo.','t-d2-4':'Playa principal — hora ideal antes del viento de tarde.','t-d2-5':'Cena tranquila. Trawen si quieren repetir, o cocinar en casa.',
+    't-d3-title':'Termas Geométricas','t-d3-sub':'El día favorito de todos','t-d3-1':'Desayuno rápido en Café de la P.','t-d3-2':'Salida hacia Termas Geométricas (35 min en auto).','t-d3-2n':'Llevar ropa de cambio, toalla, snacks. Hay pequeño café adentro pero caro.','t-d3-3':'Entrada a las termas. Tardes de 4–5 horas explorando las 20 piscinas.','t-d3-4':'Regreso a Pucón. Los niños van a dormir en el auto.','t-d3-5':'Cena para adultos en By Roots (si los niños ya duermen).',
+    't-d4-title':'Excursión a Coñaripe','t-d4-sub':'Off the beaten path','t-d4-1':'Desayuno en el depto. y salida temprana.','t-d4-2':'Ruta por el borde del lago hacia Coñaripe. Parar en miradores.','t-d4-3':'Llegada a Coñaripe. Playa del Lago Calafquén — mucho menos gente que Pucón.','t-d4-4':'Almuerzo en el pueblo o Termas de Coñaripe de camino.','t-d4-5':'Regreso a Pucón. Última tarde en el centro o lago.',
+    't-ski-title':'🎿 Pucón en invierno','t-ski-sub':'Subes en teleférico a un volcán activo. No hay nada igual.',
+    't-ski1-t':'Centro de Ski Villarrica-Pucón','t-ski1-d':'En la ladera del volcán. Pistas para todos los niveles. Temporada junio–septiembre.',
+    't-ski2-t':'Arriendo de equipos','t-ski2-d':'Hay varias tiendas en la calle principal. El precio conviene más en el pueblo que en el cerro.',
+    't-ski3-t':'Ski para niños','t-ski3-d':'El centro tiene escuela de ski para niños desde 4 años. Instructores certificados y zona aparte.',
+    't-ski4-t':'Termas después del ski','t-ski4-d':'El combo ski + termas en el mismo día es lo mejor del invierno sureño. Geométricas o Huife.',
+    't-ski-tips-title':'Tips de invierno',
+    't-sw1':'Reservar alojamiento con anticipación — el puente de julio se llena en semanas','t-sw2':'Llevar ropa térmica adicional — el viento en el cerro es intenso','t-sw3':'Los días de semana son mejores para evitar filas en los lifts','t-sw4':'El pueblo en invierno es más tranquilo — restaurantes con mesas sin espera','t-sw5':'La calefacción del depto. es a gas — el encendido lo explico yo al check-in',
+    't-contact-title':'Contacto del anfitrión','t-host-label':'Anfitrión','t-emerg-title':'Emergencias en Pucón','t-police':'Carabineros','t-fire':'Bomberos','t-ambu':'Ambulancia / SAMU','t-hosp':'Hospital de Pucón',
+    't-checkout-card':'Antes de salir','t-co1':'Check-out hasta las 12:00','t-co2':'Dejar las llaves en recepción del edificio','t-co3':'Apagar calefacción, luces y cerrar ventanas','t-co4':'Tirar la basura por el ducto del entrepiso 3–4',
+    't-review-title':'¿Cómo estuvo todo?','t-review-body':'Crecí veraneando en Pucón y espero que hayan sentido esa misma magia. Si disfrutaron la estadía, una reseña nos ayuda un montón a seguir mejorando.','t-review-btn':'Dejar reseña en Airbnb',
+    'lang-fab':'🌐 Idioma'
+  },
+  en: {
+    'hero-title':'Welcome to your home in the south ☀️','hero-loc':'Pucón city center','hero-lake':'5 min from the lake','hero-fam':'Family-friendly',
+    'nav-depto':'🏠 The apt.','nav-ninos':'👶 With kids','nav-comer':'🍽 Where to eat','nav-act':'🌋 Activities','nav-itin':'🗓 Itinerary','nav-ski':'🎿 Snow','nav-contact':'📞 Contact',
+    'cap-costanera':'📍 Lakeside promenade · 5 min walk from the apt.',
+    't-checkin-title':'Check-in & access','t-checkin':'Check-in','t-checkin-val':'From 3:00 PM','t-checkout':'Check-out','t-checkout-val':'Until 12:00 PM',
+    't-access':'Access','t-access-val':'24/7 reception — just mention apt. 308','t-parking':'Parking','t-parking-val':'Spot 308 · inside the building',
+    't-wifi-net':'Network','t-wifi-pass':'Password','wifi-btn':'Show password',
+    't-how-title':'How everything works',
+    't-how1':'Gas heating — I can explain in 1 min via WhatsApp if needed',
+    't-how2':'Trash: drop bags down the chute between floors 3 and 4',
+    't-how3':'Fully equipped kitchen: utensils, coffee maker, microwave, oven & blender',
+    't-how4':'Washer & dryer available in the building (floor 2)',
+    't-how5':'Bed linen and towels included','t-how6':'Elevator available',
+    't-loc-title':'Location','t-loc-intro':'The location is one of the apartment\'s biggest advantages — you can leave the car behind for your entire stay.',
+    't-loc-walk':'You\'re in the heart of Pucón. Here\'s what you can reach on foot:',
+    't-super':'Supermarket','t-super-val':'Across the street','t-cafes':'Cafés & restaurants','t-cafes-val':'2–5 min walk',
+    't-beach':'Main beach','t-beach-val':'8 min walk','t-coast':'Promenade & lake','t-coast-val':'5 min walk','t-volcan':'Villarrica Volcano','t-volcan-val':'20 min by car',
+    't-kids-intro':'Pucón is an amazing destination for families. Here are my honest recommendations so the kids have an incredible time and the parents don\'t stress.',
+    't-age1':'0 – 5 years','t-age2':'5 – 12 years','t-age3':'6 + years','t-age4':'All ages',
+    't-playa-title':'🏖 The main beach','t-playa-desc':'The main lake beach has a calm, shallow area on the left side as you enter — perfect for little ones. Water temperatures reach 18–20°C in summer. Bring floaties since there\'s no reliable rental nearby.',
+    't-raft-title':'🌊 Family rafting on the Trancura','t-raft-desc':'The Trancura river has two sections: the Lower (easy, suitable from age 6) and the Upper (more intense, from age 12). All local companies include full gear and a guide. Book in advance during January and February.',
+    't-huer-title':'🌲 Huerquehue National Park','t-huer-desc':'The trail to the lagoons (Los Huaros) is manageable with kids and ends with spectacular views. It\'s a 4-hour round trip. Bring snacks, water and a warm layer — it gets cool in the forest.','t-huer-btn':'Book entry at CONAF',
+    't-cost-title':'🦆 Promenade & boat ride','t-cost-desc':'The lakeside promenade in the afternoon is perfect with kids. There\'s a spot with ducks and swans that kids go crazy for. Short boat and catamaran rides depart from the pier — affordable and no reservation needed.',
+    't-tips-badge':'⚠️ Important tips','t-tips-title':'Good to know','t-tips-desc':'The Pucón sun is deceptively strong in summer — sunscreen is a must. In January and February the beach fills up by 5 PM, so go before 11 AM or after 6 PM. The volcano summit is not recommended for children under 8 due to the physical demand.',
+    't-eat-intro':'These are the places actually worth eating at in Pucón. Not TripAdvisor picks — these are where I eat when I\'m here.',
+    'f-todos':'All','f-desayuno':'☕ Breakfast','f-almuerzo':'🍽 Lunch','f-cena':'🌙 Dinner','f-ninos':'👶 With kids','f-pareja':'🤍 As a couple',
+    't-p-dist':'1 block away','t-p-desc':'The best place to start the day. Specialty coffee, generous toast, fresh juices. Always a local crowd — not touristy. Arrive before 10 AM to avoid a wait.',
+    't-tr-badge':'Organic','t-tr-desc':'Local organic cuisine with a strong Mapuche identity. Breakfasts are wholesome and generous. The lunch menu uses ingredients from local producers. One of my absolute favorites.',
+    't-pc-badge':'Great for families','t-pc-desc':'Thin-crust pizza, well made. Perfect for eating out with kids stress-free — varied menu, relaxed atmosphere, and a solid craft beer selection for the adults. Never disappoints.',
+    't-br-badge':'Evening out','t-br-desc':'For when the kids are asleep and the parents want a proper dinner. Inventive cuisine, great cocktails and an intimate atmosphere. Book ahead during high season.',
+    'et-breakfast':'Breakfast','et-breakfast2':'Breakfast','et-lunch':'Lunch','et-lunch2':'Lunch','et-dinner':'Dinner','et-dinner2':'Dinner','et-kids':'With kids','et-kids2':'With kids','et-kids3':'With kids','et-quick':'Quick','et-couple':'As a couple','et-res':'Reservation recommended',
+    't-v-title':'🌋 Villarrica Volcano','t-v-badge':'Iconic','t-v-desc':'The full ascent is for adults and kids over 12. The family alternative is the CONAF viewpoint trail — you reach 1,400m with incredible views without the summit effort. Leave early to avoid clouds.','t-v-tip':'Book a certified guide in advance. Spots fill up fast in summer.',
+    't-tg-title':'♨️ Termas Geométricas','t-tg-badge':'Must-do','t-tg-desc':'The most spectacular hot springs in the area, 35 km from Pucón. 20 pools of hot water in a fern canyon. Perfect for the whole family — kids love exploring the different temperatures.','t-tg-tip':'Go on a weekday, not the weekend. Arrive at 11 AM to make the most of it. Book online in advance.',
+    't-rf-title':'🌊 Trancura River Rafting','t-rf-badge':'Adrenaline','t-rf-desc':'The Lower Trancura section is ideal for families — class II and III, guide and full gear included. Lasts about 2 hours, often ending with a riverside BBQ. Several operators on the road to the volcano.','t-rf-tip':'Best time is 10 AM for higher water volume and calmer conditions before the afternoon wind.',
+    't-pn-title':'🌿 National Parks','t-pn-badge':'Nature','t-pn-desc':'Huerquehue is the most accessible for families. The Los Huaros lagoon trail takes 4h and is doable. Villarrica Park also has shorter trails suitable for young children. Buy your ticket online at conaf.cl.','t-pn-tip':'Bring snacks, water, insect repellent and a warm layer even if Pucón is hot — the forest is always cooler.',
+    't-co-title':'🚗 Day trip to Coñaripe','t-co-badge':'Excursion','t-co-desc':'50 km away is a completely different world: Coñaripe is a small village on Lake Calafquén, far less touristy than Pucón. You can also stop at the Río Liquiñe or Coñaripe hot springs on the way.','t-co-tip':'The lakeside route is one of the most beautiful drives in Araucanía — leave time to stop at the viewpoints.',
+    't-strip1':'Day 1 · Beach','t-strip3':'Day 3 · Hot springs',
+    't-itin-intro':'A 4-day suggested plan for families. It\'s not rigid — use it as a starting point and adjust to your pace.',
+    't-d1-title':'Arrival & first impressions','t-d1-sub':'Relaxed, explore, lake','t-d1-1':'Check in. Drop the bags, connect to WiFi.','t-d1-2':'First walk through the center. Grocery run (across the street).','t-d1-2n':'The main street has crafts, ice cream shops and local stores to browse.','t-d1-3':'Lakeside promenade. The kids meet the water.','t-d1-3n':'Beautiful afternoon light. Take the kids to see the swans.','t-d1-4':'Family dinner at Pizza Cala.',
+    't-d2-title':'Volcano & beach','t-d2-sub':'The most iconic day','t-d2-1':'Early breakfast at Trawen.','t-d2-2':'Volcano trail (family viewpoint) or full ascent for older kids.','t-d2-2n':'Leave early — clouds typically roll in by afternoon.','t-d2-3':'Picnic lunch with volcano views or back in town.','t-d2-4':'Main beach — perfect timing before the afternoon wind.','t-d2-5':'Easy dinner. Trawen again or cook at home.',
+    't-d3-title':'Termas Geométricas','t-d3-sub':'Everyone\'s favourite day','t-d3-1':'Quick breakfast at Café de la P.','t-d3-2':'Drive to Termas Geométricas (35 min).','t-d3-2n':'Bring a change of clothes, towel, snacks. Small café inside but pricey.','t-d3-3':'Enter the hot springs. Spend 4–5 hours exploring 20 pools.','t-d3-4':'Head back to Pucón. Kids will be asleep in the car.','t-d3-5':'Adults\' dinner at By Roots (once the kids are down).',
+    't-d4-title':'Day trip to Coñaripe','t-d4-sub':'Off the beaten path','t-d4-1':'Breakfast at the apt. and early departure.','t-d4-2':'Lakeside drive toward Coñaripe. Stop at viewpoints.','t-d4-3':'Arrive in Coñaripe. Lake Calafquén beach — far fewer people than Pucón.','t-d4-4':'Lunch in the village or at Coñaripe hot springs on the way back.','t-d4-5':'Return to Pucón. Last afternoon at the center or lake.',
+    't-ski-title':'🎿 Pucón in winter','t-ski-sub':'You ride a cable car up an active volcano. Nothing else like it.',
+    't-ski1-t':'Villarrica-Pucón Ski Center','t-ski1-d':'On the volcano slopes. Runs for all levels. Season: June–September.',
+    't-ski2-t':'Equipment rental','t-ski2-d':'Several shops on the main street. Better prices in town than at the mountain.',
+    't-ski3-t':'Ski school for kids','t-ski3-d':'The center has a ski school for children from age 4. Certified instructors and a dedicated learners\' area.',
+    't-ski4-t':'Hot springs after skiing','t-ski4-d':'Ski + hot springs on the same day is the best combo of a southern winter. Geométricas or Huife.',
+    't-ski-tips-title':'Winter tips',
+    't-sw1':'Book accommodation early — the July long weekend sells out weeks in advance','t-sw2':'Bring extra thermal layers — the wind on the mountain is intense','t-sw3':'Weekdays are better to avoid lift queues','t-sw4':'The village in winter is quieter — restaurants have tables without waiting','t-sw5':'Heating is gas — I\'ll explain how it works at check-in',
+    't-contact-title':'Host contact','t-host-label':'Host','t-emerg-title':'Emergencies in Pucón','t-police':'Police','t-fire':'Fire department','t-ambu':'Ambulance / SAMU','t-hosp':'Pucón Hospital',
+    't-checkout-card':'Before you leave','t-co1':'Check-out by 12:00 PM','t-co2':'Leave keys at building reception','t-co3':'Turn off heating, lights and close windows','t-co4':'Dispose of rubbish via the chute between floors 3–4',
+    't-review-title':'How was everything?','t-review-body':'I grew up spending summers in Pucón and I hope you felt that same magic. If you enjoyed your stay, a review helps us a lot to keep improving.','t-review-btn':'Leave a review on Airbnb',
+    'lang-fab':'🌐 Language'
+  },
+  fr: {
+    'hero-title':'Bienvenue chez vous dans le sud ☀️','hero-loc':'Centre de Pucón','hero-lake':'À 5 min du lac','hero-fam':'Famille',
+    'nav-depto':'🏠 L\'appart.','nav-ninos':'👶 Avec enfants','nav-comer':'🍽 Où manger','nav-act':'🌋 Activités','nav-itin':'🗓 Itinéraire','nav-ski':'🎿 Neige','nav-contact':'📞 Contact',
+    'cap-costanera':'📍 Promenade du lac · 5 min à pied de l\'appart.',
+    't-checkin-title':'Check-in et accès','t-checkin':'Check-in','t-checkin-val':'À partir de 15h00','t-checkout':'Check-out','t-checkout-val':'Avant 12h00',
+    't-access':'Accès','t-access-val':'Réception 24h/24 — indiquez l\'appart. 308','t-parking':'Parking','t-parking-val':'Place 308 · dans l\'enceinte',
+    't-wifi-net':'Réseau','t-wifi-pass':'Mot de passe','wifi-btn':'Voir le code',
+    't-how-title':'Comment tout fonctionne',
+    't-how1':'Chauffage au gaz — je t\'explique en 1 min par WhatsApp si besoin',
+    't-how2':'Poubelles : jeter les sacs par le conduit entre les étages 3 et 4',
+    't-how3':'Cuisine équipée : ustensiles, cafetière, micro-ondes, four et mixeur',
+    't-how4':'Lave-linge et sèche-linge disponibles dans l\'immeuble (étage 2)',
+    't-how5':'Draps et serviettes inclus','t-how6':'Ascenseur disponible',
+    't-loc-title':'Emplacement','t-loc-intro':'L\'emplacement est l\'un des grands atouts de l\'appartement : vous pouvez vous passer de voiture pendant tout votre séjour.',
+    't-loc-walk':'Vous êtes en plein centre de Pucón. Voici ce que vous avez à pied :',
+    't-super':'Supermarché','t-super-val':'En traversant la rue','t-cafes':'Cafés et restaurants','t-cafes-val':'2–5 min à pied',
+    't-beach':'Plage principale','t-beach-val':'8 min à pied','t-coast':'Promenade et lac','t-coast-val':'5 min à pied','t-volcan':'Volcan Villarrica','t-volcan-val':'20 min en voiture',
+    't-kids-intro':'Pucón est une destination incroyable pour les familles. Voici mes recommandations honnêtes pour que les enfants passent un séjour inoubliable.',
+    't-age1':'0 – 5 ans','t-age2':'5 – 12 ans','t-age3':'6 + ans','t-age4':'Tous âges',
+    't-playa-title':'🏖 La plage principale','t-playa-desc':'La plage principale du lac a une zone d\'eaux calmes et peu profondes sur la gauche en entrant — idéale pour les plus petits. L\'eau atteint 18–20°C en été. Apportez des bouées car il n\'y a pas de location fiable à proximité.',
+    't-raft-title':'🌊 Rafting familial sur le Trancura','t-raft-desc':'La rivière Trancura a deux sections : le Bas (facile, à partir de 6 ans) et le Haut (plus intense, à partir de 12 ans). Toutes les entreprises locales fournissent équipement complet et guide. Réserver à l\'avance en janvier et février.',
+    't-huer-title':'🌲 Parc National Huerquehue','t-huer-desc':'Le sentier jusqu\'aux lagunes (Los Huaros) est accessible avec des enfants et se termine par des vues spectaculaires. Comptez 4h aller-retour. Apportez des snacks, de l\'eau et un vêtement chaud — il fait plus frais en forêt.','t-huer-btn':'Réserver l\'entrée CONAF',
+    't-cost-title':'🦆 Promenade et tour en bateau','t-cost-desc':'La promenade du lac l\'après-midi est parfaite avec des enfants. Il y a un secteur avec canards et cygnes qui enchante les plus petits. Des bateaux et catamarans partent du ponton pour des tours courts — abordables et sans réservation.',
+    't-tips-badge':'⚠️ Conseils importants','t-tips-title':'Bon à savoir','t-tips-desc':'Le soleil à Pucón est très fort en été même sans le ressentir — la crème solaire est indispensable. En janvier-février la plage se remplit jusqu\'à 17h, allez-y avant 11h ou après 18h. Le volcan n\'est pas recommandé aux enfants de moins de 8 ans.',
+    't-eat-intro':'Ce sont les endroits où ça vaut vraiment la peine de manger à Pucón. Pas des recommandations TripAdvisor — ce sont les endroits où je mange quand je suis ici.',
+    'f-todos':'Tous','f-desayuno':'☕ Petit-déjeuner','f-almuerzo':'🍽 Déjeuner','f-cena':'🌙 Dîner','f-ninos':'👶 Avec enfants','f-pareja':'🤍 En couple',
+    't-p-dist':'À 1 bloc','t-p-desc':'Le meilleur endroit pour commencer la journée. Café de spécialité, toasts généreux, jus frais. Toujours une clientèle locale — pas touristique. Arriver avant 10h pour éviter l\'attente.',
+    't-tr-badge':'Bio','t-tr-desc':'Cuisine bio locale dans un cadre à forte identité mapuche. Les petits-déjeuners sont généreux et sains. Le menu du déjeuner utilise des produits de producteurs locaux. Un de mes absolus favoris.',
+    't-pc-badge':'Idéal famille','t-pc-desc':'Pizza à pâte fine, bien faite. Parfait pour manger avec des enfants sans stress — carte variée, ambiance détendue et une belle sélection de bières artisanales pour les adultes.',
+    't-br-badge':'Soirée','t-br-desc':'Pour quand les enfants dorment et que les parents veulent un vrai dîner. Cuisine inventive, bons cocktails et ambiance intime. Réserver à l\'avance en haute saison.',
+    'et-breakfast':'Petit-déjeuner','et-breakfast2':'Petit-déjeuner','et-lunch':'Déjeuner','et-lunch2':'Déjeuner','et-dinner':'Dîner','et-dinner2':'Dîner','et-kids':'Avec enfants','et-kids2':'Avec enfants','et-kids3':'Avec enfants','et-quick':'Rapide','et-couple':'En couple','et-res':'Réservation conseillée',
+    't-v-title':'🌋 Volcan Villarrica','t-v-badge':'Incontournable','t-v-desc':'L\'ascension complète est pour adultes et enfants de plus de 12 ans. L\'alternative familiale est le sentier des belvédères CONAF — on atteint 1 400m avec des vues incroyables sans l\'effort du sommet. Partez tôt pour éviter les nuages.','t-v-tip':'Réserver un guide certifié à l\'avance. Les places partent vite en été.',
+    't-tg-title':'♨️ Termas Geométricas','t-tg-badge':'Incontournable','t-tg-desc':'Les sources chaudes les plus spectaculaires de la région, à 35 km de Pucón. 20 piscines d\'eau chaude dans un canyon de fougères. Parfait pour toute la famille.','t-tg-tip':'Y aller en semaine, pas le week-end. Arriver à 11h pour bien en profiter. Réserver en ligne à l\'avance.',
+    't-rf-title':'🌊 Rafting rivière Trancura','t-rf-badge':'Adrénaline','t-rf-desc':'La section basse du Trancura est idéale pour les familles — classe II et III, avec guide et équipement complet. Dure environ 2h.','t-rf-tip':'Meilleur horaire : 10h pour un débit plus élevé et des conditions plus calmes avant le vent de l\'après-midi.',
+    't-pn-title':'🌿 Parcs Nationaux','t-pn-badge':'Nature','t-pn-desc':'Huerquehue est le plus accessible pour les familles. Le sentier des lagunes prend 4h. Le Parc Villarrica a des sentiers plus courts adaptés aux jeunes enfants. Acheter le billet en ligne sur conaf.cl.','t-pn-tip':'Apporter snacks, eau, répulsif et une couche chaude même s\'il fait chaud à Pucón — en forêt il fait toujours plus frais.',
+    't-co-title':'🚗 Journée à Coñaripe','t-co-badge':'Excursion','t-co-desc':'À 50 km se trouve un autre monde : Coñaripe est un petit village sur le lac Calafquén, bien moins touristique. On peut aussi s\'arrêter aux sources chaudes de Río Liquiñe ou de Coñaripe.','t-co-tip':'La route au bord du lac est l\'un des plus beaux trajets d\'Araucanie — prenez le temps de vous arrêter aux belvédères.',
+    't-strip1':'Jour 1 · Plage','t-strip3':'Jour 3 · Sources',
+    't-itin-intro':'Une proposition sur 4 jours pour les familles. Elle n\'est pas rigide — utilisez-la comme point de départ et adaptez-la à votre rythme.',
+    't-d1-title':'Arrivée et premières découvertes','t-d1-sub':'Calme, exploration, lac','t-d1-1':'Check-in. Poser les valises, se connecter au WiFi.','t-d1-2':'Premier tour du centre. Courses au supermarché (en face).','t-d1-2n':'La rue principale a de l\'artisanat, des glaciers et des boutiques à explorer.','t-d1-3':'Promenade du lac. Les enfants font connaissance avec l\'eau.','t-d1-3n':'Belle lumière en fin d\'après-midi. Emmenez les enfants voir les cygnes.','t-d1-4':'Dîner en famille chez Pizza Cala.',
+    't-d2-title':'Volcan et plage','t-d2-sub':'La journée la plus emblématique','t-d2-1':'Petit-déjeuner tôt chez Trawen.','t-d2-2':'Sentier du volcan (belvédère famille) ou ascension pour les plus grands.','t-d2-2n':'Partir tôt — les nuages arrivent souvent l\'après-midi.','t-d2-3':'Pique-nique avec vue sur le volcan ou retour en ville.','t-d2-4':'Plage principale — moment idéal avant le vent de l\'après-midi.','t-d2-5':'Dîner tranquille. Trawen si vous voulez revenir, ou cuisiner à l\'appart.',
+    't-d3-title':'Termas Geométricas','t-d3-sub':'Le jour préféré de tous','t-d3-1':'Petit-déjeuner rapide au Café de la P.','t-d3-2':'Départ vers Termas Geométricas (35 min en voiture).','t-d3-2n':'Apporter des vêtements de rechange, serviette, snacks. Petit café sur place mais cher.','t-d3-3':'Entrée aux sources. Passer 4–5h à explorer les 20 bassins.','t-d3-4':'Retour à Pucón. Les enfants dormiront dans la voiture.','t-d3-5':'Dîner adultes chez By Roots (si les enfants dorment).',
+    't-d4-title':'Excursion à Coñaripe','t-d4-sub':'Hors des sentiers battus','t-d4-1':'Petit-déjeuner à l\'appart. et départ tôt.','t-d4-2':'Route au bord du lac vers Coñaripe. S\'arrêter aux belvédères.','t-d4-3':'Arrivée à Coñaripe. Plage du lac Calafquén — bien moins de monde qu\'à Pucón.','t-d4-4':'Déjeuner au village ou aux sources de Coñaripe sur le retour.','t-d4-5':'Retour à Pucón. Dernier après-midi au centre ou au lac.',
+    't-ski-title':'🎿 Pucón en hiver','t-ski-sub':'Vous montez en téléphérique sur un volcan actif. Rien de tel ailleurs.',
+    't-ski1-t':'Station de ski Villarrica-Pucón','t-ski1-d':'Sur le flanc du volcan. Pistes pour tous niveaux. Saison : juin–septembre.',
+    't-ski2-t':'Location de matériel','t-ski2-d':'Plusieurs magasins dans la rue principale. Meilleurs prix en ville qu\'à la montagne.',
+    't-ski3-t':'Ski pour enfants','t-ski3-d':'La station a une école de ski pour enfants dès 4 ans. Moniteurs certifiés et zone débutants séparée.',
+    't-ski4-t':'Sources thermales après le ski','t-ski4-d':'Ski + sources chaudes le même jour : le meilleur combo de l\'hiver austral. Geométricas ou Huife.',
+    't-ski-tips-title':'Conseils d\'hiver',
+    't-sw1':'Réserver l\'hébergement à l\'avance — le long week-end de juillet est pris des semaines avant','t-sw2':'Apporter des sous-vêtements thermiques supplémentaires — le vent sur la montagne est intense','t-sw3':'Les jours de semaine sont mieux pour éviter les files aux remontées mécaniques','t-sw4':'Le village en hiver est plus calme — restaurants avec tables sans attente','t-sw5':'Chauffage au gaz — je vous explique le fonctionnement au check-in',
+    't-contact-title':'Contact de l\'hôte','t-host-label':'Hôte','t-emerg-title':'Urgences à Pucón','t-police':'Police','t-fire':'Pompiers','t-ambu':'Ambulance / SAMU','t-hosp':'Hôpital de Pucón',
+    't-checkout-card':'Avant de partir','t-co1':'Check-out avant 12h00','t-co2':'Laisser les clés à la réception de l\'immeuble','t-co3':'Éteindre le chauffage, les lumières et fermer les fenêtres','t-co4':'Jeter les poubelles par la conduite entre les étages 3–4',
+    't-review-title':'Comment s\'est passé le séjour ?','t-review-body':'J\'ai grandi à passer mes étés à Pucón et j\'espère que vous avez ressenti cette même magie. Si vous avez apprécié votre séjour, un avis nous aide beaucoup.','t-review-btn':'Laisser un avis sur Airbnb',
+    'lang-fab':'🌐 Langue'
+  },
+  it: {
+    'hero-title':'Benvenuti a casa vostra nel sud ☀️','hero-loc':'Centro di Pucón','hero-lake':'A 5 min dal lago','hero-fam':'Familiare',
+    'nav-depto':'🏠 L\'appart.','nav-ninos':'👶 Con bambini','nav-comer':'🍽 Dove mangiare','nav-act':'🌋 Attività','nav-itin':'🗓 Itinerario','nav-ski':'🎿 Neve','nav-contact':'📞 Contatto',
+    'cap-costanera':'📍 Lungolago · 5 min a piedi dall\'appartamento',
+    't-checkin-title':'Check-in e accesso','t-checkin':'Check-in','t-checkin-val':'Dalle 15:00','t-checkout':'Check-out','t-checkout-val':'Entro le 12:00',
+    't-access':'Accesso','t-access-val':'Portineria 24h — indica solo l\'appart. 308','t-parking':'Parcheggio','t-parking-val':'Posto 308 · all\'interno dell\'edificio',
+    't-wifi-net':'Rete','t-wifi-pass':'Password','wifi-btn':'Mostra password',
+    't-how-title':'Come funziona tutto',
+    't-how1':'Riscaldamento a gas — ti spiego in 1 minuto via WhatsApp se serve',
+    't-how2':'Spazzatura: gettare i sacchi nel condotto tra il 3° e 4° piano',
+    't-how3':'Cucina attrezzata: utensili, macchinetta caffè, microonde, forno e frullatore',
+    't-how4':'Lavatrice e asciugatrice disponibili nell\'edificio (piano 2)',
+    't-how5':'Lenzuola e asciugamani inclusi','t-how6':'Ascensore disponibile',
+    't-loc-title':'Posizione','t-loc-intro':'La posizione è uno dei principali vantaggi dell\'appartamento: puoi dimenticarti dell\'auto per tutto il soggiorno.',
+    't-loc-walk':'Sei nel cuore di Pucón. Ecco cosa raggiungi a piedi:',
+    't-super':'Supermercato','t-super-val':'Attraversando la strada','t-cafes':'Caffè e ristoranti','t-cafes-val':'2–5 min a piedi',
+    't-beach':'Spiaggia principale','t-beach-val':'8 min a piedi','t-coast':'Lungomare e lago','t-coast-val':'5 min a piedi','t-volcan':'Vulcano Villarrica','t-volcan-val':'20 min in auto',
+    't-kids-intro':'Pucón è una destinazione incredibile per le famiglie. Ecco i miei consigli onesti affinché i bambini si divertano al massimo.',
+    't-age1':'0 – 5 anni','t-age2':'5 – 12 anni','t-age3':'6 + anni','t-age4':'Tutte le età',
+    't-playa-title':'🏖 La spiaggia principale','t-playa-desc':'La spiaggia principale del lago ha una zona con acque calme e poco profonde sul lato sinistro — ideale per i più piccoli. L\'acqua in estate raggiunge i 18–20°C. Porta i galleggianti perché il noleggio in zona non è affidabile.',
+    't-raft-title':'🌊 Rafting in famiglia sul Trancura','t-raft-desc':'Il fiume Trancura ha due tratti: il Basso (facile, adatto dai 6 anni) e l\'Alto (più adrenalinico, dai 12 anni). Tutte le aziende locali includono attrezzatura completa e guida. Prenotare in anticipo a gennaio e febbraio.',
+    't-huer-title':'🌲 Parco Nazionale Huerquehue','t-huer-desc':'Il sentiero per le lagune (Los Huaros) è praticabile con bambini e termina con viste spettacolari. Sono 4 ore andata e ritorno. Portare snack, acqua e un indumento caldo — in foresta fa sempre più fresco.','t-huer-btn':'Prenotare ingresso CONAF',
+    't-cost-title':'🦆 Lungomare e gita in barca','t-cost-desc':'Il lungomare nel pomeriggio è perfetto con i bambini. C\'è un\'area con anatre e cigni che fa impazzire i più piccoli. Barche e catamarani partono dal molo per brevi giri — economici e senza prenotazione.',
+    't-tips-badge':'⚠️ Consigli importanti','t-tips-title':'Cosa sapere','t-tips-desc':'Il sole a Pucón è molto forte in estate anche se non lo si percepisce — la crema solare è indispensabile. A gennaio e febbraio la spiaggia si riempie fino alle 17, andarci prima delle 11 o dopo le 18. Il vulcano non è consigliato ai bambini sotto gli 8 anni.',
+    't-eat-intro':'Questi sono i posti dove vale davvero la pena mangiare a Pucón. Non sono le solite raccomandazioni di TripAdvisor — sono i posti dove mangio quando sono qui.',
+    'f-todos':'Tutti','f-desayuno':'☕ Colazione','f-almuerzo':'🍽 Pranzo','f-cena':'🌙 Cena','f-ninos':'👶 Con bambini','f-pareja':'🤍 In coppia',
+    't-p-dist':'A 1 isolato','t-p-desc':'Il posto migliore per iniziare la giornata. Caffè di specialità, toast generosi, succhi freschi. Sempre clientela locale — non turistica. Arrivare prima delle 10 per non aspettare.',
+    't-tr-badge':'Bio','t-tr-desc':'Cucina bio locale con una forte identità mapuche. Le colazioni sono generose e sane. Il menù del pranzo utilizza ingredienti di produttori locali. Uno dei miei assoluti preferiti.',
+    't-pc-badge':'Ideale famiglia','t-pc-desc':'Pizza con pasta sottile, ben fatta. Perfetto per mangiare con i bambini senza stress — carta variata, atmosfera rilassata e una buona selezione di birre artigianali per gli adulti.',
+    't-br-badge':'Serata fuori','t-br-desc':'Per quando i bambini dormono e i genitori vogliono una vera cena. Cucina inventiva, ottimi cocktail e atmosfera intima. Prenotare in anticipo in alta stagione.',
+    'et-breakfast':'Colazione','et-breakfast2':'Colazione','et-lunch':'Pranzo','et-lunch2':'Pranzo','et-dinner':'Cena','et-dinner2':'Cena','et-kids':'Con bambini','et-kids2':'Con bambini','et-kids3':'Con bambini','et-quick':'Veloce','et-couple':'In coppia','et-res':'Prenotazione consigliata',
+    't-v-title':'🌋 Vulcano Villarrica','t-v-badge':'Iconico','t-v-desc':'L\'ascensione completa è per adulti e bambini sopra i 12 anni. L\'alternativa per famiglie è il sentiero dei belvedere CONAF — si raggiungono 1.400m con viste incredibili senza lo sforzo della vetta. Partire presto per evitare le nuvole.','t-v-tip':'Prenotare una guida certificata in anticipo. I posti si esauriscono rapidamente in estate.',
+    't-tg-title':'♨️ Termas Geométricas','t-tg-badge':'Da non perdere','t-tg-desc':'Le terme più spettacolari della zona, a 35 km da Pucón. 20 piscine di acqua calda in un canyon di felci. Perfetto per tutta la famiglia.','t-tg-tip':'Andare nei giorni feriali, non nel weekend. Arrivare alle 11 per sfruttarle al meglio. Prenotare online in anticipo.',
+    't-rf-title':'🌊 Rafting sul fiume Trancura','t-rf-badge':'Adrenalina','t-rf-desc':'Il tratto Basso del Trancura è ideale per famiglie — classe II e III, con guida e attrezzatura inclusa. Dura circa 2 ore.','t-rf-tip':'Orario migliore: le 10 del mattino per un volume d\'acqua maggiore e condizioni più tranquille prima del vento pomeridiano.',
+    't-pn-title':'🌿 Parchi Nazionali','t-pn-badge':'Natura','t-pn-desc':'Huerquehue è il più accessibile per famiglie. Il sentiero per le lagune dura 4h. Il Parco Villarrica ha sentieri più brevi adatti ai bambini piccoli. Acquistare il biglietto online su conaf.cl.','t-pn-tip':'Portare snack, acqua, repellente e un indumento caldo anche se a Pucón fa caldo — in foresta fa sempre più fresco.',
+    't-co-title':'🚗 Gita a Coñaripe','t-co-badge':'Escursione','t-co-desc':'A 50 km si trova un mondo completamente diverso: Coñaripe è un piccolo villaggio sul lago Calafquén, molto meno turistico di Pucón. Di passaggio si possono visitare le Terme Río Liquiñe o quelle di Coñaripe.','t-co-tip':'La strada costiera è uno dei tragitti più belli della Araucanía — lascia tempo per fermarti ai belvedere.',
+    't-strip1':'Giorno 1 · Spiaggia','t-strip3':'Giorno 3 · Terme',
+    't-itin-intro':'Una proposta di 4 giorni per famiglie. Non è rigida — usala come punto di partenza e adattala al tuo ritmo.',
+    't-d1-title':'Arrivo e prime impressioni','t-d1-sub':'Rilassato, esplorare, lago','t-d1-1':'Check-in. Depositare i bagagli, connettersi al WiFi.','t-d1-2':'Prima passeggiata nel centro. Spesa al supermercato (di fronte).','t-d1-2n':'La strada principale ha artigianato, gelaterie e negozi da esplorare.','t-d1-3':'Lungomare e lago. I bambini scoprono l\'acqua.','t-d1-3n':'Bella luce nel tardo pomeriggio. Porta i bambini a vedere i cigni.','t-d1-4':'Cena in famiglia da Pizza Cala.',
+    't-d2-title':'Vulcano e spiaggia','t-d2-sub':'Il giorno più iconico','t-d2-1':'Colazione presto da Trawen.','t-d2-2':'Sentiero del vulcano (belvedere famiglia) o ascensione per i più grandi.','t-d2-2n':'Partire presto — le nuvole arrivano spesso nel pomeriggio.','t-d2-3':'Picnic con vista sul vulcano o rientro in paese.','t-d2-4':'Spiaggia principale — momento ideale prima del vento pomeridiano.','t-d2-5':'Cena tranquilla. Trawen di nuovo o cucinare in casa.',
+    't-d3-title':'Termas Geométricas','t-d3-sub':'Il giorno preferito da tutti','t-d3-1':'Colazione veloce al Café de la P.','t-d3-2':'Partenza per le Termas Geométricas (35 min in auto).','t-d3-2n':'Portare un cambio di vestiti, asciugamano, snack. Piccolo caffè sul posto ma caro.','t-d3-3':'Entrata alle terme. Passare 4–5 ore esplorando le 20 piscine.','t-d3-4':'Rientro a Pucón. I bambini dormiranno in macchina.','t-d3-5':'Cena per adulti da By Roots (se i bambini dormono già).',
+    't-d4-title':'Gita a Coñaripe','t-d4-sub':'Fuori dai sentieri battuti','t-d4-1':'Colazione in appartamento e partenza presto.','t-d4-2':'Strada costiera verso Coñaripe. Fermarsi ai belvedere.','t-d4-3':'Arrivo a Coñaripe. Spiaggia del lago Calafquén — molta meno gente che a Pucón.','t-d4-4':'Pranzo in paese o alle terme di Coñaripe di ritorno.','t-d4-5':'Rientro a Pucón. Ultimo pomeriggio al centro o al lago.',
+    't-ski-title':'🎿 Pucón in inverno','t-ski-sub':'Sali in cabinovia su un vulcano attivo. Non esiste niente di simile.',
+    't-ski1-t':'Centro sci Villarrica-Pucón','t-ski1-d':'Sul versante del vulcano. Piste per tutti i livelli. Stagione: giugno–settembre.',
+    't-ski2-t':'Noleggio attrezzatura','t-ski2-d':'Diversi negozi nella via principale. Prezzi migliori in paese che in montagna.',
+    't-ski3-t':'Sci per bambini','t-ski3-d':'Il centro ha una scuola di sci per bambini dai 4 anni. Istruttori certificati e area principianti separata.',
+    't-ski4-t':'Terme dopo lo sci','t-ski4-d':'Sci + terme nello stesso giorno: il miglior combo dell\'inverno australe. Geométricas o Huife.',
+    't-ski-tips-title':'Consigli invernali',
+    't-sw1':'Prenotare l\'alloggio in anticipo — il ponte di luglio è prenotato con settimane di anticipo','t-sw2':'Portare indumenti termici extra — il vento in montagna è intenso','t-sw3':'I giorni feriali sono migliori per evitare code agli impianti','t-sw4':'Il paese in inverno è più tranquillo — ristoranti con tavoli senza attesa','t-sw5':'Riscaldamento a gas — spiego io il funzionamento al check-in',
+    't-contact-title':'Contatto host','t-host-label':'Host','t-emerg-title':'Emergenze a Pucón','t-police':'Polizia','t-fire':'Vigili del fuoco','t-ambu':'Ambulanza / SAMU','t-hosp':'Ospedale di Pucón',
+    't-checkout-card':'Prima di partire','t-co1':'Check-out entro le 12:00','t-co2':'Lasciare le chiavi alla portineria','t-co3':'Spegnere riscaldamento, luci e chiudere le finestre','t-co4':'Gettare la spazzatura nel condotto tra il 3° e 4° piano',
+    't-review-title':'Com\'è andata?','t-review-body':'Sono cresciuto trascorrendo le estati a Pucón e spero che abbiate sentito la stessa magia. Se avete apprezzato il soggiorno, una recensione ci aiuta molto.','t-review-btn':'Lascia una recensione su Airbnb',
+    'lang-fab':'🌐 Lingua'
+  }
+};
+
+// ══════════════════════════════════════
+// APLICAR IDIOMA
+// ══════════════════════════════════════
+function setLang(lang) {
+  const dict = T[lang];
+  Object.keys(dict).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = dict[id];
+  });
+  // WiFi button special case
+  const wifiBtn = document.getElementById('wifi-btn');
+  if (wifiBtn && !wifiVisible.v) wifiBtn.textContent = dict['wifi-btn'];
+  // FAB label
+  document.getElementById('lang-fab').textContent = dict['lang-fab'];
+  document.getElementById('lang-fab').style.display = 'block';
+  // Hide lang screen
+  document.getElementById('lang-screen').classList.add('gone');
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+
+// ══════════════════════════════════════
+// WIFI
+// ══════════════════════════════════════
+const wifiVisible = { v: false };
+function revealWifi() {
+  const el = document.getElementById('wpass');
+  const btn = document.getElementById('wifi-btn');
+  if (!wifiVisible.v) {
+    el.textContent = 'Fresia308';
+    btn.textContent = 'Ocultar';
+    wifiVisible.v = true;
+  } else {
+    el.textContent = '••••••••';
+    btn.textContent = 'Ver clave';
+    wifiVisible.v = false;
+  }
+}
+
+// ══════════════════════════════════════
+// NAV
+// ══════════════════════════════════════
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('visible');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleDay(header) {
+  const body = header.nextElementSibling;
+  const arrow = header.querySelector('.day-arrow');
+  body.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
+function filtrar(tag, btn) {
+  document.querySelectorAll('.filtro').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.resto-card').forEach(card => {
+    card.style.display = (tag === 'todos' || card.dataset.tags.includes(tag)) ? 'block' : 'none';
+  });
+}
+</script>
+</body>
+</html>
