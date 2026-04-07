@@ -13,7 +13,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--crema); color: var(--text); font-size: 15px; line-height: 1.6; }
- 
+
   /* ── LANGUAGE SCREEN ── */
   #lang-screen {
     position: fixed; inset: 0; z-index: 9999;
@@ -23,7 +23,7 @@
     transition: opacity .3s ease;
   }
   #lang-screen.gone { display: none; }
- 
+
   /* decorative circles */
   #lang-screen::before {
     content: ''; position: absolute; top: -80px; right: -80px;
@@ -35,13 +35,13 @@
     width: 200px; height: 200px; border-radius: 50%;
     background: rgba(82,183,136,0.07); pointer-events: none;
   }
- 
+
   .lang-volcano { font-size: 52px; margin-bottom: 10px; }
   .lang-title { color: #fff; font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 4px; letter-spacing: -.01em; }
   .lang-hook { color: #9FE1CB; font-size: 14px; text-align: center; margin-bottom: 6px; font-style: italic; }
   .lang-divider { width: 40px; height: 1px; background: rgba(255,255,255,0.2); margin: 10px auto 20px; }
   .lang-prompt { color: rgba(255,255,255,0.7); font-size: 13px; text-align: center; margin-bottom: 20px; }
- 
+
   /* auto-detect banner */
   #lang-detect-banner {
     background: rgba(255,255,255,0.12);
@@ -65,9 +65,9 @@
     transition: opacity .15s;
   }
   .detect-yes:active { opacity: .8; }
- 
+
   .lang-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 320px; }
- 
+
   /* Español destacado — ocupa toda la fila */
   .lang-btn-primary {
     grid-column: 1 / -1;
@@ -91,7 +91,7 @@
     letter-spacing: .04em; text-transform: uppercase;
     flex-shrink: 0;
   }
- 
+
   .lang-btn {
     background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
     border-radius: var(--radius); padding: 16px 10px;
@@ -103,7 +103,7 @@
   .lang-flag { font-size: 30px; line-height: 1; }
   .lang-name { color: #fff; font-size: 13px; font-weight: 600; }
   .lang-native { color: #9FE1CB; font-size: 11px; }
- 
+
   /* ── LANG SWITCHER FLOTANTE ── */
   #lang-fab {
     position: fixed; bottom: 22px; right: 16px; z-index: 500;
@@ -113,7 +113,7 @@
     cursor: pointer; display: none;
     box-shadow: 0 2px 12px rgba(0,0,0,0.25);
   }
- 
+
   /* ── HERO ── */
   .hero { position: relative; height: 320px; overflow: hidden; display: flex; align-items: flex-end; }
   .hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 60%; }
@@ -123,7 +123,7 @@
   .hero h1 { color: #fff; font-size: 26px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; text-shadow: 0 1px 4px rgba(0,0,0,0.4); }
   .hero-meta { display: flex; gap: 14px; flex-wrap: wrap; }
   .hero-meta span { color: rgba(255,255,255,0.85); font-size: 12px; display: flex; align-items: center; gap: 4px; }
- 
+
   /* ── NAV ── */
   .nav-wrap { background: var(--verde); padding: 0 16px 14px; position: sticky; top: 0; z-index: 100; }
   .nav { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; padding-bottom: 2px; }
@@ -131,12 +131,12 @@
   .nav-btn { flex-shrink: 0; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.75); border: none; padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s; white-space: nowrap; }
   .nav-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
   .nav-btn.active { background: #fff; color: var(--verde); }
- 
+
   /* ── LAYOUT ── */
   .container { max-width: 640px; margin: 0 auto; padding: 20px 16px 80px; }
   .section { display: none; }
   .section.visible { display: block; }
- 
+
   /* ── PHOTO ── */
   .photo-banner { width: 100%; height: 180px; border-radius: var(--radius); overflow: hidden; position: relative; margin-bottom: 14px; }
   .photo-banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -145,7 +145,7 @@
   .photo-strip-item { border-radius: var(--radius-sm); overflow: hidden; height: 120px; position: relative; }
   .photo-strip-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .photo-strip-label { position: absolute; bottom: 0; left: 0; right: 0; padding: 6px 8px; background: linear-gradient(to top, rgba(10,30,20,0.7), transparent); color: rgba(255,255,255,0.9); font-size: 11px; font-weight: 600; }
- 
+
   /* ── CARDS ── */
   .card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 18px 20px; margin-bottom: 14px; }
   .card-title { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--verde-mid); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
@@ -154,25 +154,25 @@
   .info-row:last-child { border-bottom: none; padding-bottom: 0; }
   .info-label { color: var(--text-muted); font-size: 14px; flex-shrink: 0; }
   .info-value { font-size: 14px; font-weight: 600; color: var(--text); text-align: right; }
- 
+
   /* ── WIFI ── */
   .wifi-box { background: var(--verde-pale); border-radius: var(--radius-sm); padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
   .wifi-label { font-size: 12px; color: var(--verde-mid); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
   .wifi-val { font-size: 18px; font-weight: 700; color: var(--verde); font-family: 'SF Mono', monospace; }
   .wifi-copy { background: var(--verde); color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
- 
+
   /* ── PILLS ── */
   .pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
   .pill-green { background: var(--verde-pale); color: #085041; }
   .pill-amber { background: var(--amber-pale); color: var(--amber); }
   .pill-purple { background: #EEEDFE; color: #3C3489; }
- 
+
   /* ── CHECKLIST ── */
   .checklist { list-style: none; }
   .checklist li { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text); }
   .checklist li:last-child { border-bottom: none; }
   .check-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--verde-light); margin-top: 6px; flex-shrink: 0; }
- 
+
   /* ── RESTAURANTS ── */
   .resto-grid { display: flex; flex-direction: column; gap: 12px; }
   .resto-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
@@ -194,7 +194,7 @@
   .et-pareja    { background: #FCE7F3; color: #9D174D; }
   .et-rapido    { background: #F1F5F9; color: #475569; }
   .et-reserva   { background: #FAEEDA; color: #854F0B; }
- 
+
   /* ── ACTIVITIES ── */
   .act-grid { display: flex; flex-direction: column; gap: 12px; }
   .act-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
@@ -206,7 +206,7 @@
   .act-body p { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
   .act-tip { background: var(--amber-pale); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 13px; color: var(--amber); font-weight: 500; }
   .act-tip::before { content: '💡 '; }
- 
+
   /* ── ITINERARY ── */
   .itin-day { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; }
   .itin-day-header { background: var(--verde); padding: 12px 18px; display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; }
@@ -222,7 +222,7 @@
   .itin-time { font-size: 11px; font-weight: 700; color: var(--verde-mid); min-width: 40px; padding-top: 2px; }
   .itin-text { font-size: 14px; color: var(--text); line-height: 1.5; }
   .itin-note { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
- 
+
   /* ── SKI ── */
   .ski-hero { width: 100%; height: 200px; border-radius: var(--radius); overflow: hidden; position: relative; margin-bottom: 14px; }
   .ski-hero img { width: 100%; height: 100%; object-fit: cover; object-position: center 40%; }
@@ -234,7 +234,7 @@
   .ski-card .ski-icon { font-size: 24px; margin-bottom: 6px; }
   .ski-card h4 { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
   .ski-card p { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
- 
+
   /* ── KIDS ── */
   .kids-grid { display: flex; flex-direction: column; gap: 12px; }
   .kids-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
@@ -243,7 +243,7 @@
   .kids-age { display: inline-block; background: var(--verde-pale); color: #085041; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .05em; }
   .kids-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
   .kids-card p { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
- 
+
   /* ── BUTTONS ── */
   .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
   .link-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 999px; background: var(--verde); color: #fff; font-size: 12px; font-weight: 600; text-decoration: none; border: none; }
@@ -251,7 +251,7 @@
   .link-btn::after { content: '↗'; font-size: 11px; opacity: .8; }
   .link-btn-outline { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 999px; background: transparent; color: var(--verde-mid); font-size: 12px; font-weight: 600; text-decoration: none; border: 1.5px solid var(--verde-light); }
   .link-btn-outline::after { content: '↗'; font-size: 11px; opacity: .7; }
- 
+
   /* ── MISC ── */
   .section-intro { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 18px; padding: 14px 16px; background: var(--white); border-radius: var(--radius-sm); border-left: 3px solid var(--verde-light); }
   .star-footer { background: var(--verde); border-radius: var(--radius); padding: 24px 20px; text-align: center; margin-top: 8px; }
@@ -264,7 +264,7 @@
 </style>
 </head>
 <body>
- 
+
 <!-- ══════════════════════════════════
      PANTALLA DE SELECCIÓN DE IDIOMA
 ══════════════════════════════════ -->
@@ -274,13 +274,13 @@
   <div class="lang-hook">Tu refugio en el sur de Chile</div>
   <div class="lang-divider"></div>
   <div class="lang-prompt">Para darte la mejor experiencia, elige tu idioma 👇</div>
- 
+
   <!-- Banner auto-detección -->
   <div id="lang-detect-banner">
     <span id="detect-text" class="detect-text">Detectamos inglés — ¿continuar en English?</span>
     <button class="detect-yes" id="detect-yes-btn" onclick="acceptDetected()">Sí →</button>
   </div>
- 
+
   <div class="lang-grid">
     <!-- Español destacado -->
     <button class="lang-btn-primary" onclick="setLang('es')">
@@ -291,7 +291,7 @@
       </div>
       <span class="lang-badge-rec">Recomendado</span>
     </button>
- 
+
     <!-- Otros idiomas -->
     <button class="lang-btn" onclick="setLang('en')">
       <span class="lang-flag">🇬🇧</span>
@@ -315,10 +315,10 @@
     </button>
   </div>
 </div>
- 
+
 <!-- Botón flotante para cambiar idioma -->
 <button id="lang-fab" onclick="document.getElementById('lang-screen').classList.remove('gone')">🌐 Idioma</button>
- 
+
 <!-- ══════════════════════════════════
      HERO
 ══════════════════════════════════ -->
@@ -335,7 +335,7 @@
     </div>
   </div>
 </div>
- 
+
 <!-- ══════════════════════════════════
      NAV
 ══════════════════════════════════ -->
@@ -350,9 +350,9 @@
     <button class="nav-btn" onclick="show('contacto',this)" id="nav-contact">📞 Contacto</button>
   </div>
 </div>
- 
+
 <div class="container">
- 
+
   <!-- DEPTO -->
   <div id="s-depto" class="section visible">
     <div class="photo-banner">
@@ -401,7 +401,7 @@
       <div class="info-row"><span class="info-label" id="t-volcan">Volcán Villarrica</span><span class="info-value" id="t-volcan-val">20 min en auto</span></div>
     </div>
   </div>
- 
+
   <!-- NIÑOS -->
   <div id="s-ninos" class="section">
     <div class="section-intro" id="t-kids-intro">Pucón es un destino increíble para familias. Aquí van mis recomendaciones más honestas para que los niños la pasen increíble y los papás no la sufran.</div>
@@ -447,7 +447,7 @@
       </div>
     </div>
   </div>
- 
+
   <!-- COMER -->
   <div id="s-comer" class="section">
     <div class="section-intro" id="t-eat-intro">Estos son los lugares donde realmente vale la pena comer en Pucón. No son recomendaciones de TripAdvisor — son los lugares donde yo como cuando estoy en Pucón.</div>
@@ -473,8 +473,13 @@
             <span class="etiqueta et-ninos" id="et-kids">Con niños</span>
             <span class="etiqueta et-rapido" id="et-quick">Rápido</span>
           </div>
+          <div class="btn-row">
+            <a class="link-btn" href="https://www.facebook.com/delappucon" target="_blank">Ver en Facebook</a>
+            <a class="link-btn-outline" href="https://maps.app.goo.gl/cafelap" target="_blank">Maps</a>
+          </div>
         </div>
       </div>
+
       <div class="resto-card" data-tags="desayuno almuerzo ninos">
         <img class="resto-img" src="trawen.jpeg" alt="Trawen" onerror="this.style.display='none'">
         <div class="resto-body">
@@ -488,8 +493,13 @@
             <span class="etiqueta et-almuerzo" id="et-lunch">Almuerzo</span>
             <span class="etiqueta et-ninos" id="et-kids2">Con niños</span>
           </div>
+          <div class="btn-row">
+            <a class="link-btn" href="https://www.facebook.com/restaurantetrawen" target="_blank">Ver en Facebook</a>
+            <a class="link-btn-outline" href="https://maps.app.goo.gl/trawen" target="_blank">Maps</a>
+          </div>
         </div>
       </div>
+
       <div class="resto-card" data-tags="almuerzo cena ninos">
         <img class="resto-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Eq_it-na_pizza-margherita_sep2005_sml.jpg/1280px-Eq_it-na_pizza-margherita_sep2005_sml.jpg" alt="Pizza Cala" onerror="this.style.display='none'">
         <div class="resto-body">
@@ -503,8 +513,13 @@
             <span class="etiqueta et-cena" id="et-dinner">Cena</span>
             <span class="etiqueta et-ninos" id="et-kids3">Con niños</span>
           </div>
+          <div class="btn-row">
+            <a class="link-btn" href="https://www.instagram.com/pizza_cala_" target="_blank">Ver en Instagram</a>
+            <a class="link-btn-outline" href="https://maps.app.goo.gl/pizzacala" target="_blank">Maps</a>
+          </div>
         </div>
       </div>
+
       <div class="resto-card" data-tags="cena pareja reserva">
         <img class="resto-img" src="img/by-roots.jpg" alt="By Roots" onerror="this.style.display='none'">
         <div class="resto-body">
@@ -518,11 +533,76 @@
             <span class="etiqueta et-pareja" id="et-couple">En pareja</span>
             <span class="etiqueta et-reserva" id="et-res">Reserva recomendada</span>
           </div>
+          <div class="btn-row">
+            <a class="link-btn" href="https://www.instagram.com/byroots.pucon" target="_blank">Ver en Instagram</a>
+            <a class="link-btn-outline" href="https://maps.app.goo.gl/byroots" target="_blank">Maps</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="resto-card" data-tags="desayuno almuerzo ninos rapido">
+        <img class="resto-img" src="img/cassis.jpg" alt="Cassis" onerror="this.style.display='none'">
+        <div class="resto-body">
+          <div class="resto-header">
+            <div><div class="resto-name">Cassis</div><div class="resto-meal">O'Higgins 311</div></div>
+            <span class="pill pill-blue">Clásico</span>
+          </div>
+          <p class="resto-desc">El restaurant más icónico de Pucón — décadas encantando a locales y turistas. Chocolates artesanales, pasteles, sándwiches y jugos. Decoración de madera cálida que se siente como Pucón de siempre. Inevitable al menos una vez.</p>
+          <div class="resto-tags">
+            <span class="etiqueta et-desayuno">Desayuno</span>
+            <span class="etiqueta et-almuerzo">Almuerzo</span>
+            <span class="etiqueta et-ninos">Con niños</span>
+            <span class="etiqueta et-rapido">Rápido</span>
+          </div>
+          <div class="btn-row">
+            <a class="link-btn" href="https://cassiscafe.com" target="_blank">Sitio web</a>
+            <a class="link-btn-outline" href="https://www.instagram.com/cassiscafe" target="_blank">Instagram</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="resto-card" data-tags="almuerzo cena ninos">
+        <img class="resto-img" src="img/la-maga.jpg" alt="La Maga" onerror="this.style.display='none'">
+        <div class="resto-body">
+          <div class="resto-header">
+            <div><div class="resto-name">La Maga</div><div class="resto-meal">O'Higgins 597</div></div>
+            <span class="pill pill-amber">Parrilla</span>
+          </div>
+          <p class="resto-desc">Parrilla uruguaya con los mejores cortes de carne de Pucón. Bife de chorizo, costillas, chimichurri de la casa. Los platos son enormes — pedir para compartir es una buena idea. Ambiente familiar y sin apuro.</p>
+          <div class="resto-tags">
+            <span class="etiqueta et-almuerzo">Almuerzo</span>
+            <span class="etiqueta et-cena">Cena</span>
+            <span class="etiqueta et-ninos">Con niños</span>
+          </div>
+          <div class="btn-row">
+            <a class="link-btn" href="https://www.lamaga.cl/en/menu_maga" target="_blank">Ver carta</a>
+            <a class="link-btn-outline" href="https://maps.app.goo.gl/lamaga" target="_blank">Maps</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="resto-card" data-tags="cena pareja reserva">
+        <img class="resto-img" src="img/campos.jpg" alt="Campos" onerror="this.style.display='none'">
+        <div class="resto-body">
+          <div class="resto-header">
+            <div><div class="resto-name">Campos</div><div class="resto-meal">O'Higgins 930</div></div>
+            <span class="pill pill-purple">Top Pucón</span>
+          </div>
+          <p class="resto-desc">Para muchos, el mejor restaurante de Pucón. Cocina con identidad, ingredientes locales y atención impecable. El nivel de detalle se nota en cada plato. Ideal para una noche especial o cuando quieren llevar la experiencia gastronómica al máximo.</p>
+          <div class="resto-tags">
+            <span class="etiqueta et-cena">Cena</span>
+            <span class="etiqueta et-pareja">En pareja</span>
+            <span class="etiqueta et-reserva">Reserva recomendada</span>
+          </div>
+          <div class="btn-row">
+            <a class="link-btn" href="https://www.instagram.com/campos.restaurant" target="_blank">Ver en Instagram</a>
+            <a class="link-btn-outline" href="https://restaurantcampos.com" target="_blank">Sitio web</a>
+          </div>
         </div>
       </div>
     </div>
   </div>
- 
+
   <!-- ACTIVIDADES -->
   <div id="s-actividades" class="section">
     <div class="act-grid">
@@ -568,7 +648,7 @@
       </div>
     </div>
   </div>
- 
+
   <!-- ITINERARIO -->
   <div id="s-itinerario" class="section">
     <div class="photo-strip">
@@ -582,7 +662,7 @@
       </div>
     </div>
     <div class="section-intro" id="t-itin-intro">Una propuesta para 4 días, pensada para familias. No es rígida — úsala como punto de partida y ajústala a su ritmo.</div>
- 
+
     <div class="itin-day">
       <div class="itin-day-header" onclick="toggleDay(this)">
         <div class="day-num">1</div>
@@ -639,7 +719,7 @@
       </div>
     </div>
   </div>
- 
+
   <!-- SKI -->
   <div id="s-ski" class="section">
     <div class="ski-hero">
@@ -668,7 +748,7 @@
       </ul>
     </div>
   </div>
- 
+
   <!-- CONTACTO -->
   <div id="s-contacto" class="section">
     <div class="card">
@@ -699,10 +779,10 @@
       <a class="contact-btn" href="https://airbnb.com" target="_blank" id="t-review-btn">Dejar reseña en Airbnb</a>
     </div>
   </div>
- 
+
 </div>
 <div class="toast" id="toast">Copiado ✓</div>
- 
+
 <script>
 // ══════════════════════════════════════
 // AUTO-DETECCIÓN DE IDIOMA
@@ -714,7 +794,7 @@ const DETECT_MAP = {
   'de': { lang: 'de', msg: 'Wir haben Deutsch erkannt — auf Deutsch fortfahren?', yes: 'Ja →' },
 };
 let detectedLang = null;
- 
+
 (function detectBrowserLang() {
   const nav = (navigator.language || navigator.userLanguage || '').toLowerCase().slice(0, 2);
   if (DETECT_MAP[nav]) {
@@ -725,7 +805,7 @@ let detectedLang = null;
     document.getElementById('lang-detect-banner').classList.add('visible');
   }
 })();
- 
+
 function acceptDetected() {
   if (detectedLang) setLang(detectedLang);
 }
@@ -1001,7 +1081,7 @@ const T = {
     'lang-fab':'🌐 Sprache'
   }
 };
- 
+
 // ══════════════════════════════════════
 // APLICAR IDIOMA
 // ══════════════════════════════════════
@@ -1022,7 +1102,7 @@ function setLang(lang) {
   // Scroll to top
   window.scrollTo(0, 0);
 }
- 
+
 // ══════════════════════════════════════
 // WIFI
 // ══════════════════════════════════════
@@ -1040,7 +1120,7 @@ function revealWifi() {
     wifiVisible.v = false;
   }
 }
- 
+
 // ══════════════════════════════════════
 // NAV
 // ══════════════════════════════════════
@@ -1051,14 +1131,14 @@ function show(id, btn) {
   btn.classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
- 
+
 function toggleDay(header) {
   const body = header.nextElementSibling;
   const arrow = header.querySelector('.day-arrow');
   body.classList.toggle('open');
   arrow.classList.toggle('open');
 }
- 
+
 function filtrar(tag, btn) {
   document.querySelectorAll('.filtro').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
