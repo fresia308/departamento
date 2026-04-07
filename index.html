@@ -218,6 +218,40 @@
   /* TOAST */
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text); color: #fff; padding: 10px 20px; border-radius: 999px; font-size: 13px; font-weight: 500; transition: transform .3s ease; z-index: 999; white-space: nowrap; }
   .toast.show { transform: translateX(-50%) translateY(0); }
+/* FILTROS */
+.filtro {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.filtro:hover { border-color: var(--verde-light); color: var(--verde-mid); }
+.filtro.active { background: var(--verde); color: #fff; border-color: var(--verde); }
+
+/* ETIQUETAS ESTANDARIZADAS */
+.etiqueta {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-right: 4px;
+  margin-bottom: 4px;
+}
+.et-desayuno { background: #FEF3C7; color: #92400E; }
+.et-almuerzo  { background: #E1F5EE; color: #085041; }
+.et-cena      { background: #EDE9FE; color: #4C1D95; }
+.et-ninos     { background: #DBEAFE; color: #1E40AF; }
+.et-pareja    { background: #FCE7F3; color: #9D174D; }
+.et-rapido    { background: #F1F5F9; color: #475569; }
+.et-reserva   { background: #FAEEDA; color: #854F0B; }
+
 </style>
 </head>
 <body>
@@ -366,59 +400,87 @@
   </div>
 
   <!-- COMER -->
-  <div id="s-comer" class="section">
-    <div class="section-intro">No son recomendaciones de TripAdvisor — son los lugares donde yo como cuando estoy en Pucón. Todos aguantan bien con familia y niños.</div>
+<div id="s-comer" class="section">
+  <div class="section-intro">No son recomendaciones de TripAdvisor — son los lugares donde yo como cuando estoy en Pucón. Todos aguantan bien con familia y niños.</div>
 
-    <div class="resto-grid">
-      <div class="resto-card">
-        <img class="resto-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Breakfast_food_display.jpg/1280px-Breakfast_food_display.jpg" alt="Desayuno" onerror="this.style.display='none'">
-        <div class="resto-body">
-          <div class="resto-header">
-            <div><div class="resto-name">Café de la P</div><div class="resto-meal">Desayuno · mañana</div></div>
-            <span class="pill pill-green">A 1 cuadra</span>
-          </div>
-          <p class="resto-desc">El mejor lugar para partir el día. Café de especialidad, tostadas generosas, jugos naturales. Siempre hay ambiente local — no turístico. Llegar antes de las 10 para no esperar.</p>
-          <div class="resto-tags"><span class="pill pill-green">Familia</span><span class="pill pill-blue">Café de especialidad</span></div>
+  <!-- FILTROS -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+    <button class="filtro active" onclick="filtrar('todos',this)">Todos</button>
+    <button class="filtro" onclick="filtrar('desayuno',this)">☕ Desayuno</button>
+    <button class="filtro" onclick="filtrar('almuerzo',this)">🍽 Almuerzo</button>
+    <button class="filtro" onclick="filtrar('cena',this)">🌙 Cena</button>
+    <button class="filtro" onclick="filtrar('ninos',this)">👶 Con niños</button>
+    <button class="filtro" onclick="filtrar('pareja',this)">🤍 En pareja</button>
+  </div>
+
+  <div class="resto-grid">
+
+    <div class="resto-card" data-tags="desayuno ninos rapido">
+      <img class="resto-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Breakfast_food_display.jpg/1280px-Breakfast_food_display.jpg" alt="Desayuno" onerror="this.style.display='none'">
+      <div class="resto-body">
+        <div class="resto-header">
+          <div><div class="resto-name">Café de la P</div><div class="resto-meal">O'Higgins 483</div></div>
+          <span class="pill pill-green">A 1 cuadra</span>
         </div>
-      </div>
-
-      <div class="resto-card">
-        <img class="resto-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Food_at_a_market_in_Chile.jpg/1280px-Food_at_a_market_in_Chile.jpg" alt="Comida local chilena" onerror="this.style.display='none'">
-        <div class="resto-body">
-          <div class="resto-header">
-            <div><div class="resto-name">Trawen</div><div class="resto-meal">Desayuno · almuerzo</div></div>
-            <span class="pill pill-amber">Orgánico</span>
-          </div>
-          <p class="resto-desc">Cocina orgánica local en un ambiente con mucha identidad mapuche. Los desayunos son generosos y sanos. En el almuerzo tienen platos con ingredientes de productores de la zona. Uno de mis favoritos absolutos.</p>
-          <div class="resto-tags"><span class="pill pill-green">Familia</span><span class="pill pill-purple">Comida local</span></div>
-        </div>
-      </div>
-
-      <div class="resto-card">
-        <img class="resto-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Eq_it-na_pizza-margherita_sep2005_sml.jpg/1280px-Eq_it-na_pizza-margherita_sep2005_sml.jpg" alt="Pizza" onerror="this.style.display='none'">
-        <div class="resto-body">
-          <div class="resto-header">
-            <div><div class="resto-name">Pizza Cala</div><div class="resto-meal">Almuerzo · cena</div></div>
-            <span class="pill pill-green">Ideal familia</span>
-          </div>
-          <p class="resto-desc">Pizza de masa delgada, bien hecha. Perfecto para comer con niños sin estrés — carta variada, ambiente relajado, y una buena selección de cervezas artesanales para los adultos. Nunca defrauda.</p>
-          <div class="resto-tags"><span class="pill pill-green">Niños</span><span class="pill pill-blue">Cerveza artesanal</span></div>
-        </div>
-      </div>
-
-      <div class="resto-card">
-        <img class="resto-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Dining_room_restaurant.jpg/1280px-Dining_room_restaurant.jpg" alt="Restaurante noche" onerror="this.style.display='none'">
-        <div class="resto-body">
-          <div class="resto-header">
-            <div><div class="resto-name">By Roots</div><div class="resto-meal">Cena · noche</div></div>
-            <span class="pill pill-purple">Para la noche</span>
-          </div>
-          <p class="resto-desc">Para cuando los niños ya durmieron y los papás quieren una cena de verdad. Cocina con personalidad, buenos tragos y ambiente íntimo. Reservar con anticipación en temporada alta.</p>
-          <div class="resto-tags"><span class="pill pill-purple">Coctelería</span><span class="pill pill-amber">Reservar antes</span></div>
+        <p class="resto-desc">El mejor lugar para partir el día. Café de especialidad, tostadas generosas, jugos naturales. Siempre hay ambiente local — no turístico. Llegar antes de las 10 para no esperar.</p>
+        <div class="resto-tags">
+          <span class="etiqueta et-desayuno">Desayuno</span>
+          <span class="etiqueta et-ninos">Con niños</span>
+          <span class="etiqueta et-rapido">Rápido</span>
         </div>
       </div>
     </div>
+
+    <div class="resto-card" data-tags="desayuno almuerzo ninos">
+      <img class="resto-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Food_at_a_market_in_Chile.jpg/1280px-Food_at_a_market_in_Chile.jpg" alt="Comida local chilena" onerror="this.style.display='none'">
+      <div class="resto-body">
+        <div class="resto-header">
+          <div><div class="resto-name">Trawen</div><div class="resto-meal">Fresia 243</div></div>
+          <span class="pill pill-amber">Orgánico</span>
+        </div>
+        <p class="resto-desc">Cocina orgánica local en un ambiente con mucha identidad mapuche. Los desayunos son generosos y sanos. En el almuerzo tienen platos con ingredientes de productores de la zona. Uno de mis favoritos absolutos.</p>
+        <div class="resto-tags">
+          <span class="etiqueta et-desayuno">Desayuno</span>
+          <span class="etiqueta et-almuerzo">Almuerzo</span>
+          <span class="etiqueta et-ninos">Con niños</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="resto-card" data-tags="almuerzo cena ninos">
+      <img class="resto-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Eq_it-na_pizza-margherita_sep2005_sml.jpg/1280px-Eq_it-na_pizza-margherita_sep2005_sml.jpg" alt="Pizza" onerror="this.style.display='none'">
+      <div class="resto-body">
+        <div class="resto-header">
+          <div><div class="resto-name">Pizza Cala</div><div class="resto-meal">O'Higgins 524</div></div>
+          <span class="pill pill-green">Ideal familia</span>
+        </div>
+        <p class="resto-desc">Pizza de masa delgada, bien hecha. Perfecto para comer con niños sin estrés — carta variada, ambiente relajado, y una buena selección de cervezas artesanales para los adultos. Nunca defrauda.</p>
+        <div class="resto-tags">
+          <span class="etiqueta et-almuerzo">Almuerzo</span>
+          <span class="etiqueta et-cena">Cena</span>
+          <span class="etiqueta et-ninos">Con niños</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="resto-card" data-tags="cena pareja reserva">
+      <img class="resto-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Dining_room_restaurant.jpg/1280px-Dining_room_restaurant.jpg" alt="Restaurante noche" onerror="this.style.display='none'">
+      <div class="resto-body">
+        <div class="resto-header">
+          <div><div class="resto-name">By Roots</div><div class="resto-meal">Fresia 128</div></div>
+          <span class="pill pill-purple">Para la noche</span>
+        </div>
+        <p class="resto-desc">Para cuando los niños ya durmieron y los papás quieren una cena de verdad. Cocina con personalidad, buenos tragos y ambiente íntimo. Reservar con anticipación en temporada alta.</p>
+        <div class="resto-tags">
+          <span class="etiqueta et-cena">Cena</span>
+          <span class="etiqueta et-pareja">En pareja</span>
+          <span class="etiqueta et-reserva">Reserva recomendada</span>
+        </div>
+      </div>
+    </div>
+
   </div>
+</div>
 
   <!-- ACTIVIDADES -->
   <div id="s-actividades" class="section">
@@ -639,6 +701,18 @@
     body.classList.toggle('open');
     arrow.classList.toggle('open');
   }
+function filtrar(tag, btn) {
+  document.querySelectorAll('.filtro').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.resto-card').forEach(card => {
+    if (tag === 'todos' || card.dataset.tags.includes(tag)) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
 </script>
 </body>
 </html>
